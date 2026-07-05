@@ -254,7 +254,7 @@ function analyzeThreat(text) {
 }
 
 let pollingInterval = null;
-const API_BASE = "https://isap-backend-dbij.vercel.app";
+const API_BASE = "";
 
 function initRealtimeData() {
     const regionSelect = document.getElementById('region-select');
