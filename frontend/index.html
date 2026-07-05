@@ -321,12 +321,13 @@
                         <div id="map" class="w-full flex-1 rounded bg-dark-900 border border-gray-800"></div>
                     </div>
 
-                    <!-- Timeline / Volume Trend -->
-                    <div class="cyber-card p-4 h-56 shrink-0">
-                        <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
-                                class="ph-fill ph-trend-up text-accent-emerald"></i> VOLUME PERCAKAPAN 24 JAM</h2>
-                        <div class="relative w-full h-40">
-                            <canvas id="trendChart"></canvas>
+                    <!-- Trending Topics -->
+                    <div class="cyber-card p-4 h-56 shrink-0 flex flex-col">
+                        <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
+                                class="ph-fill ph-trend-up text-accent-emerald"></i> TRENDING TOPIK & KATA KUNCI</h2>
+                        <div class="flex-1 overflow-y-auto pr-1 space-y-2" id="trending-keywords-dashboard">
+                            <!-- JS Injected Trending -->
+                            <div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-emerald text-xl"></i></div>
                         </div>
                     </div>
                 </div>

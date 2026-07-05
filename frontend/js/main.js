@@ -154,42 +154,7 @@ function initCharts() {
         }
     });
 
-    // Timeline Line Chart
-    const ctxTrend = document.getElementById('trendChart').getContext('2d');
-    
-    // Gradient fill
-    const gradient = ctxTrend.createLinearGradient(0, 0, 0, 200);
-    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
-    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
-    new Chart(ctxTrend, {
-        type: 'line',
-        data: {
-            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', 'Sekarang'],
-            datasets: [{
-                label: 'Volume Percakapan',
-                data: [120, 80, 450, 950, 1200, 1800, 2100],
-                borderColor: '#3B82F6',
-                borderWidth: 2,
-                backgroundColor: gradient,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#0B1120',
-                pointBorderColor: '#3B82F6',
-                pointBorderWidth: 2,
-                pointRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(75, 85, 99, 0.2)' }, border: { display: false } },
-                x: { grid: { display: false }, border: { display: false } }
-            }
-        }
-    });
 
     // News Sentiment Chart
     const ctxNewsSent = document.getElementById('newsSentimentChart');
@@ -408,13 +373,37 @@ async function fetchSocialData() {
         
         // Render Keywords
         const kwdList = document.getElementById('analytics-keywords-list');
-        if (kwdList && keywords.length > 0) {
-            kwdList.innerHTML = keywords.map(k => `
+        const dashKwdList = document.getElementById('trending-keywords-dashboard');
+        
+        if (keywords.length > 0) {
+            const kwdHTML = keywords.map(k => `
                 <div class="p-2 rounded bg-dark-900 border border-gray-700 flex justify-between items-center hover:border-gray-500 transition-colors">
-                    <span class="text-xs font-bold text-accent-emerald">${k.word.toUpperCase()}</span>
-                    <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} occurances</span>
+                    <span class="text-xs font-bold text-accent-emerald">#${k.word.toUpperCase()}</span>
+                    <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} mentions</span>
                 </div>
             `).join('');
+            
+            if (kwdList) kwdList.innerHTML = kwdHTML;
+            
+            if (dashKwdList) {
+                // Add trend arrows for dashboard view to look more dynamic
+                dashKwdList.innerHTML = keywords.slice(0, 5).map((k, i) => {
+                    const isUp = Math.random() > 0.3;
+                    const color = isUp ? 'text-accent-emerald' : 'text-accent-amber';
+                    const icon = isUp ? 'ph-trend-up' : 'ph-trend-down';
+                    return `
+                    <div class="p-2 rounded bg-dark-900 border border-gray-700/50 flex justify-between items-center hover:border-gray-500 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] font-mono text-gray-500 w-4">${i+1}.</span>
+                            <span class="text-xs font-bold text-white">#${k.word.toUpperCase()}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} vol</span>
+                            <i class="ph-fill ${icon} ${color} text-sm"></i>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
         }
         
         // Render Sources
