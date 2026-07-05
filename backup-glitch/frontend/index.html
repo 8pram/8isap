@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISAP - Intelligence Situational Awareness Platform</title>
+    <!-- Tailwind CSS (Play CDN for rapid dev) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0B1120', // Main background
+                            800: '#111827', // Card background
+                            700: '#1F2937', // Border/Hover
+                        },
+                        accent: {
+                            blue: '#3B82F6',
+                            emerald: '#10B981',
+                            red: '#EF4444',
+                            amber: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- LeafletJS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B1120;
+            color: #E5E7EB;
+        }
+
+        .cyber-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+        }
+
+        .cyber-header {
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+            background: linear-gradient(90deg, rgba(17, 24, 39, 1) 0%, rgba(30, 58, 138, 0.2) 100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.6);
+        }
+
+        .pulse-red {
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background-color: rgba(239, 68, 68, 0.1);
+            border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            animation-name: ticker;
+            animation-duration: 80s;
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(-100%, 0, 0);
+            }
+        }
+
+        #map {
+            z-index: 10;
+            border-radius: 0.5rem;
+        }
+
+        .leaflet-container {
+            background: #0B1120 !important;
+        }
+
+        /* Map custom styling to look like radar/dark mode */
+        .leaflet-layer,
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out,
+        .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+    </style>
+</head>
+
+<body class="h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- Emergency Ticker -->
+    <div class="ticker-wrap text-[10px] h-6 font-mono text-accent-red flex items-center px-4 shrink-0 overflow-hidden">
+        <i class="ph-fill ph-warning-circle mr-2 text-sm pulse-red rounded-full shrink-0"></i>
+        <span class="font-bold mr-4 shrink-0 whitespace-nowrap">LIVE THREAT FEED:</span>
+        <div class="flex-1 overflow-hidden h-full flex items-center">
+            <div class="ticker">
+                [14:02 WIB] Deteksi provokasi massa di wilayah Bangil - Sentimen Negatif 87% &nbsp;&nbsp;|&nbsp;&nbsp;
+                [13:45 WIB] Hoaks penculikan anak menyebar cepat di grup WhatsApp Pasuruan Timur - Potensi main hakim
+                sendiri &nbsp;&nbsp;|&nbsp;&nbsp; [13:30 WIB] Peningkatan tagar #TurunkanHarga di Jatim mencapai 15.000
+                sebutan/jam &nbsp;&nbsp;|&nbsp;&nbsp; [12:15 WIB] Rencana aksi unjuk rasa buruh di PIER terdeteksi untuk
+                lusa.
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="cyber-header px-6 py-3 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-4">
+            <div
+                class="w-10 h-10 bg-accent-blue/20 rounded-lg border border-accent-blue/50 flex items-center justify-center text-accent-blue">
+                <i class="ph-fill ph-radar text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-wider text-white">ISAP <span
+                        class="text-accent-blue font-light">COMMAND CENTER</span></h1>
+                <p class="text-[10px] text-gray-400 font-mono tracking-widest">INTELLIGENCE SITUATIONAL AWARENESS
+                    PLATFORM</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="text-right">
+                <p class="text-sm font-mono font-bold text-white" id="live-time">00:00:00 WIB</p>
+                <p class="text-xs text-gray-400 font-mono" id="live-date">1 Jan 2026</p>
+            </div>
+            <div class="h-8 w-px bg-gray-700"></div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden md:block">
+                    <p class="text-[10px] text-gray-400 font-mono">CLEARANCE</p>
+                    <p class="text-xs font-bold text-accent-emerald tracking-wider">LEVEL 5 (COMMAND)</p>
+                </div>
+                <div class="w-9 h-9 rounded-full bg-gray-800 border-2 border-accent-emerald overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name=Admin+Intel&background=111827&color=10B981"
+                        alt="Profile">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden p-4 gap-4">
+        <!-- Sidebar Navigation -->
+        <aside class="w-16 flex flex-col gap-4 shrink-0 hidden md:flex">
+            <nav class="cyber-card flex-1 py-4 flex flex-col items-center gap-6">
+                <button
+                    class="w-10 h-10 rounded-lg bg-accent-blue/20 text-accent-blue flex items-center justify-center border border-accent-blue/50 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer"
+                    title="Executive Dashboard">
+                    <i class="ph ph-squares-four text-xl"></i>
+                </button>
+                <button
+                    class="w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 flex items-center justify-center transition-all cursor-pointer"
+                    title="Social Intelligence">
+                    <i class="ph ph-globe-hemisphere-west text-xl"></i>
+                </button>
+                <button
+                    class="w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 flex items-center justify-center transition-all cursor-pointer"
+                    title="News Analytics">
+                    <i class="ph ph-newspaper text-xl"></i>
+                </button>
+                <button
+                    class="w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 flex items-center justify-center transition-all cursor-pointer"
+                    title="Threat Map">
+                    <i class="ph ph-map-trifold text-xl"></i>
+                </button>
+                <button
+                    class="w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 flex items-center justify-center transition-all cursor-pointer mt-auto"
+                    title="Settings">
+                    <i class="ph ph-gear text-xl"></i>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Central Grid Layout -->
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-12 grid-rows-6 gap-4 overflow-hidden">
+
+            <!-- Left Column: Metrics & Isu -->
+            <div class="md:col-span-3 row-span-6 flex flex-col gap-4 overflow-hidden">
+                <!-- Status & Overall -->
+                <div class="cyber-card p-4 shrink-0">
+                    <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
+                            class="ph-fill ph-activity text-accent-blue"></i> STATUS KAMTIBMAS</h2>
+                    <div class="flex items-end justify-between mb-4">
+                        <div>
+                            <p class="text-3xl font-bold text-accent-amber">SIAGA</p>
+                            <p class="text-[10px] text-gray-400 font-mono tracking-wider">PASURUAN RAYA</p>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-full border-4 border-accent-amber border-t-transparent animate-spin flex items-center justify-center relative">
+                            <i class="ph-fill ph-warning text-accent-amber text-lg absolute"></i>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-dark-900 p-2 rounded border border-gray-700/50">
+                            <p class="text-gray-500 text-[10px]">Isu Aktif Hari Ini</p>
+                            <p class="text-lg font-bold text-white">124</p>
+                        </div>
+                        <div class="bg-dark-900 p-2 rounded border border-gray-700/50">
+                            <p class="text-gray-500 text-[10px]">Ancaman Tinggi</p>
+                            <p class="text-lg font-bold text-accent-red pulse-red rounded">7</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Isu List -->
+                <div class="cyber-card p-4 flex-1 flex flex-col overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 shrink-0">
+                        <h2 class="text-[11px] text-gray-400 font-bold flex items-center gap-2 tracking-wider"><i
+                                class="ph-fill ph-fire text-accent-red"></i> TOP ISU STRATEGIS</h2>
+                        <select id="region-select"
+                            class="bg-dark-900 border border-gray-700 text-[10px] text-gray-300 rounded px-2 py-1 outline-none">
+                            <option value="Kab. Pasuruan">Kab. Pasuruan</option>
+                            <option value="Jawa Timur">Jawa Timur</option>
+                            <option value="Nasional">Nasional</option>
+                            <option value="Global">Global (Internasional)</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 overflow-y-auto pr-1 space-y-3" id="top-issues-container">
+                        <!-- JS injected issues -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Column: Map & Timeline -->
+            <div class="md:col-span-6 row-span-6 flex flex-col gap-4 overflow-hidden">
+                <!-- Map Container -->
+                <div class="cyber-card p-1.5 flex-1 relative flex flex-col">
+                    <div class="absolute top-4 left-4 z-[400] pointer-events-none">
+                        <div
+                            class="bg-dark-900/90 backdrop-blur border border-gray-700 p-2 rounded flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-accent-blue/20 flex items-center justify-center">
+                                <i class="ph-fill ph-crosshair text-accent-blue text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-400 font-mono tracking-widest">GEO-INTELLIGENCE</p>
+                                <p class="text-xs font-bold text-white">PASURUAN MAP</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Legend -->
+                    <div
+                        class="absolute bottom-4 left-4 z-[400] bg-dark-900/90 backdrop-blur border border-gray-700 p-2 rounded text-[10px] font-mono space-y-2 pointer-events-none">
+                        <div class="flex items-center gap-2"><span class="relative flex h-3 w-3"><span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-red opacity-75"></span><span
+                                    class="relative inline-flex rounded-full h-3 w-3 bg-accent-red"></span></span>
+                            Konflik/Krusial</div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-accent-amber border border-dark-900"></div>
+                            Provokasi/Hoaks
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-accent-blue border border-dark-900"></div> Pantauan
+                            Rutin
+                        </div>
+                    </div>
+                    <!-- Map element -->
+                    <div id="map" class="w-full flex-1 rounded bg-dark-900 border border-gray-800"></div>
+                </div>
+
+                <!-- Timeline / Volume Trend -->
+                <div class="cyber-card p-4 h-56 shrink-0">
+                    <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
+                            class="ph-fill ph-trend-up text-accent-emerald"></i> VOLUME PERCAKAPAN 24 JAM</h2>
+                    <div class="relative w-full h-40">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: AI Sentiment & Live Feed -->
+            <div class="md:col-span-3 row-span-6 flex flex-col gap-4 overflow-hidden">
+                <!-- AI Sentiment -->
+                <div class="cyber-card p-4 shrink-0">
+                    <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
+                            class="ph-fill ph-brain text-accent-blue"></i> AI SENTIMENT ENGINE</h2>
+                    <div class="relative h-32 flex items-center justify-center">
+                        <canvas id="sentimentChart"></canvas>
+                        <div
+                            class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
+                            <span class="text-2xl font-bold text-white" id="sentiment-score">68%</span>
+                            <span class="text-[10px] text-gray-400 tracking-widest uppercase">Negatif</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-3 text-[10px] font-mono">
+                        <div class="flex justify-between items-center"><span class="text-gray-400 w-16">PROVOKASI</span>
+                            <div class="flex-1 mx-2 bg-dark-900 rounded-full h-1.5">
+                                <div class="bg-accent-red h-1.5 rounded-full" style="width: 75%"></div>
+                            </div><span class="text-accent-red w-8 text-right">75%</span>
+                        </div>
+                        <div class="flex justify-between items-center"><span class="text-gray-400 w-16">HOAKS</span>
+                            <div class="flex-1 mx-2 bg-dark-900 rounded-full h-1.5">
+                                <div class="bg-accent-amber h-1.5 rounded-full" style="width: 45%"></div>
+                            </div><span class="text-accent-amber w-8 text-right">45%</span>
+                        </div>
+                        <div class="flex justify-between items-center"><span class="text-gray-400 w-16">SARA</span>
+                            <div class="flex-1 mx-2 bg-dark-900 rounded-full h-1.5">
+                                <div class="bg-accent-blue h-1.5 rounded-full" style="width: 12%"></div>
+                            </div><span class="text-accent-blue w-8 text-right">12%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Feed / Recommendation -->
+                <div class="cyber-card p-4 flex-1 flex flex-col overflow-hidden">
+                    <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
+                            class="ph-fill ph-robot text-accent-emerald"></i> AI RECOMMENDATION</h2>
+                    <div class="bg-accent-emerald/5 border border-accent-emerald/20 p-3 rounded mb-4 shrink-0">
+                        <p class="text-[10px] text-accent-emerald font-bold mb-1 tracking-wider">TINDAKAN PREVENTIF:</p>
+                        <p class="text-xs text-gray-300 leading-relaxed">Tingkatkan patroli cyber pada keyword <span
+                                class="text-white bg-dark-900 px-1 rounded border border-gray-700">Pilkada</span> dan
+                            <span class="text-white bg-dark-900 px-1 rounded border border-gray-700">Kecurangan</span>
+                            di platform TikTok area Pasuruan Selatan. Koordinasi dengan Bhabinkamtibmas Bangil.</p>
+                    </div>
+
+                    <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
+                            class="ph-fill ph-broadcast text-accent-blue"></i> RAW OSINT FEED</h2>
+                    <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="osint-feed">
+                        <!-- JS injected feed -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- App Logic -->
+    <script src="js/main.js"></script>
+</body>
+
+</html>

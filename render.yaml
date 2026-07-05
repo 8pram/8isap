@@ -1,0 +1,28 @@
+services:
+  # Node.js API Gateway & WebSockets
+  - type: web
+    name: isap-node-gateway
+    env: node
+    buildCommand: "cd backend-node && npm install"
+    startCommand: "cd backend-node && npm start"
+    envVars:
+      - key: NODE_VERSION
+        value: 18.18.0
+      - key: SUPABASE_URL
+        sync: false # Set via Render Dashboard
+      - key: SUPABASE_ANON_KEY
+        sync: false # Set via Render Dashboard
+
+  # Python AI Engine & Scraper
+  - type: web
+    name: isap-python-ai
+    env: python
+    buildCommand: "cd backend-python && pip install -r requirements.txt"
+    startCommand: "cd backend-python && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: SUPABASE_URL
+        sync: false # Set via Render Dashboard
+      - key: SUPABASE_ANON_KEY
+        sync: false # Set via Render Dashboard
