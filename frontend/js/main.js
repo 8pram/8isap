@@ -1,6 +1,6 @@
 /**
  * ISAP Command Center - Main Application Logic
- * Prototype MVP (Mock Data & Frontend Interactions)
+ * All data fetched from real API endpoints (Supabase + RSS)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,44 +8,34 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initMap();
     initCharts();
-    // populateTopIssues();
-    // populateOsintFeed();
     initRealtimeData();
 });
 
 // --- Navigation Logic ---
 function initNavigation() {
     const navBtns = document.querySelectorAll('.nav-btn');
-    const views = document.querySelectorAll('.view-section');
 
     navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove active classes
             navBtns.forEach(b => {
                 b.classList.remove('bg-accent-blue/20', 'text-accent-blue', 'border-accent-blue/50', 'shadow-[0_0_15px_rgba(59,130,246,0.3)]');
                 b.classList.add('text-gray-400', 'border-transparent');
                 b.querySelector('i')?.classList.remove('text-accent-blue');
             });
 
-            // Add active class to clicked
             btn.classList.remove('text-gray-400', 'border-transparent');
             btn.classList.add('bg-accent-blue/20', 'text-accent-blue', 'border-accent-blue/50', 'shadow-[0_0_15px_rgba(59,130,246,0.3)]');
             btn.querySelector('i')?.classList.add('text-accent-blue');
 
-            // Hide all views
             const views = document.querySelectorAll('.view-section');
-            views.forEach(v => {
-                v.classList.add('hidden');
-            });
-            
-            // Show target view
+            views.forEach(v => v.classList.add('hidden'));
+
             const targetId = btn.getAttribute('data-target');
-            if(targetId) {
+            if (targetId) {
                 const targetView = document.getElementById(targetId);
                 if (targetView) targetView.classList.remove('hidden');
             }
-            
-            // Trigger resize for maps/charts to re-render properly when unhidden
+
             setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
         });
     });
@@ -55,67 +45,36 @@ function initNavigation() {
 function initClock() {
     const timeEl = document.getElementById('live-time');
     const dateEl = document.getElementById('live-date');
-    
+
     setInterval(() => {
         const now = new Date();
-        const timeStr = now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
-        const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-        
-        timeEl.textContent = timeStr;
-        dateEl.textContent = dateStr;
+        timeEl.textContent = now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+        dateEl.textContent = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
     }, 1000);
 }
 
 // --- 2. Geo-Intelligence Map (Leaflet) ---
+let mainMap = null;
+let threatMap = null;
+let mainMapMarkers = [];
+let threatMapMarkers = [];
+
 function initMap() {
-    // Koordinat tengah Kabupaten Pasuruan
     const pasuruanCoords = [-7.6453, 112.8224];
-    
-    const map = L.map('map', {
+
+    mainMap = L.map('map', {
         zoomControl: false,
         attributionControl: false
     }).setView(pasuruanCoords, 10);
 
-    // Gunakan basemap gelap (CartoDB Dark Matter style, atau OpenStreetMap yg di-invert via CSS)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
-    }).addTo(map);
-
-    // Custom Icon (Red Pulse)
-    const threatIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div style="position:relative; width:20px; height:20px;">
-                <div style="position:absolute; width:100%; height:100%; background:#EF4444; border-radius:50%; opacity:0.8; z-index:2;"></div>
-                <div style="position:absolute; width:100%; height:100%; background:#EF4444; border-radius:50%; animation: pulse-red 2s infinite; z-index:1;"></div>
-               </div>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
-    });
-
-    const warningIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div style="width:12px; height:12px; background:#F59E0B; border-radius:50%; border:1px solid #0B1120;"></div>`,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6]
-    });
-
-    const infoIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div style="width:12px; height:12px; background:#3B82F6; border-radius:50%; border:1px solid #0B1120;"></div>`,
-        iconSize: [12, 12],
-        iconAnchor: [6, 6]
-    });
-
-    // Dummy Markers for Main Map
-    L.marker([-7.5986, 112.7845], {icon: threatIcon}).addTo(map).bindPopup('<b>Bangil</b><br>Potensi Provokasi Massa');
-    L.marker([-7.6453, 112.8224], {icon: warningIcon}).addTo(map).bindPopup('<b>Pasuruan Kota</b><br>Sebaran Hoaks WA');
-    L.marker([-7.7112, 112.6953], {icon: infoIcon}).addTo(map).bindPopup('<b>Pandaan</b><br>Pantauan Aktivitas Buruh');
-    L.marker([-7.7371, 112.8711], {icon: warningIcon}).addTo(map).bindPopup('<b>Grati</b><br>Isu Tanah');
+    }).addTo(mainMap);
 
     // Init Threat Map (Large)
     const threatMapEl = document.getElementById('threat-map-large');
     if (threatMapEl) {
-        const threatMap = L.map('threat-map-large', {
+        threatMap = L.map('threat-map-large', {
             zoomControl: true,
             attributionControl: false
         }).setView(pasuruanCoords, 11);
@@ -123,9 +82,68 @@ function initMap() {
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,
         }).addTo(threatMap);
-        
-        L.marker([-7.5986, 112.7845], {icon: threatIcon}).addTo(threatMap).bindPopup('<b>Bangil</b><br>Potensi Provokasi Massa');
-        L.marker([-7.6453, 112.8224], {icon: warningIcon}).addTo(threatMap).bindPopup('<b>Pasuruan Kota</b><br>Sebaran Hoaks WA');
+    }
+}
+
+function createIcon(type) {
+    if (type === 'threat') {
+        return L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style="position:relative; width:20px; height:20px;">
+                    <div style="position:absolute; width:100%; height:100%; background:#EF4444; border-radius:50%; opacity:0.8; z-index:2;"></div>
+                    <div style="position:absolute; width:100%; height:100%; background:#EF4444; border-radius:50%; animation: pulse-red 2s infinite; z-index:1;"></div>
+                   </div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+    } else if (type === 'warning') {
+        return L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style="width:12px; height:12px; background:#F59E0B; border-radius:50%; border:1px solid #0B1120;"></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6]
+        });
+    } else {
+        return L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style="width:12px; height:12px; background:#3B82F6; border-radius:50%; border:1px solid #0B1120;"></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6]
+        });
+    }
+}
+
+async function fetchMapMarkers() {
+    try {
+        const res = await fetch(`${API_BASE}/api/v1/incidents/map-markers`);
+        const markers = await res.json();
+
+        // Clear existing markers
+        mainMapMarkers.forEach(m => mainMap.removeLayer(m));
+        mainMapMarkers = [];
+        if (threatMap) {
+            threatMapMarkers.forEach(m => threatMap.removeLayer(m));
+            threatMapMarkers = [];
+        }
+
+        if (markers && markers.length > 0) {
+            markers.forEach(item => {
+                if (item.lat && item.lng) {
+                    const icon = createIcon(item.type);
+                    const popup = `<b>${item.region || ''}</b><br>${item.title}<br><small>${item.category} - ${item.severity}</small>`;
+
+                    const m1 = L.marker([item.lat, item.lng], { icon }).addTo(mainMap).bindPopup(popup);
+                    mainMapMarkers.push(m1);
+
+                    if (threatMap && (item.type === 'threat' || item.type === 'warning')) {
+                        const m2 = L.marker([item.lat, item.lng], { icon }).addTo(threatMap).bindPopup(popup);
+                        threatMapMarkers.push(m2);
+                    }
+                }
+            });
+        }
+    } catch (e) {
+        console.warn("Map markers fetch error:", e);
     }
 }
 
@@ -134,7 +152,6 @@ function initCharts() {
     Chart.defaults.color = '#9CA3AF';
     Chart.defaults.font.family = "'Inter', sans-serif";
 
-    // Sentiment Doughnut Chart
     const ctxSent = document.getElementById('sentimentChart').getContext('2d');
     window.sentimentChartInstance = new Chart(ctxSent, {
         type: 'doughnut',
@@ -154,9 +171,6 @@ function initCharts() {
         }
     });
 
-
-
-    // News Sentiment Chart
     const ctxNewsSent = document.getElementById('newsSentimentChart');
     if (ctxNewsSent) {
         window.newsSentimentChartInstance = new Chart(ctxNewsSent.getContext('2d'), {
@@ -179,13 +193,56 @@ function initCharts() {
     }
 }
 
-// --- 4. Real-Time OSINT Data (Google News RSS Proxy) ---
+// --- 4. Real-Time Data Engine ---
 
-const CORS_PROXIES = [
-    "https://corsproxy.io/?",
-    "https://api.codetabs.com/v1/proxy?quest=",
-    "https://api.allorigins.win/get?url="
-];
+const THREAT_KEYWORDS = {
+    red: ['demo', 'unjuk rasa', 'bentrok', 'tawuran', 'ricuh', 'carok', 'kerusuhan', 'kebakaran'],
+    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
+    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan']
+};
+
+function analyzeThreat(text) {
+    const lower = text.toLowerCase();
+    let threatLevel = 'blue';
+    let category = 'Sosial';
+
+    for (const kw of THREAT_KEYWORDS.red) {
+        if (lower.includes(kw)) {
+            threatLevel = 'red'; category = 'Kamtibmas';
+            break;
+        }
+    }
+
+    if (threatLevel === 'blue') {
+        for (const kw of THREAT_KEYWORDS.amber) {
+            if (lower.includes(kw)) {
+                threatLevel = 'amber';
+                if (['hoaks', 'provokasi', 'radikal', 'teroris'].includes(kw)) {
+                    category = 'Siber/Teror';
+                } else {
+                    category = 'Kriminal';
+                }
+                break;
+            }
+        }
+    }
+
+    if (threatLevel === 'blue') {
+        for (const kw of THREAT_KEYWORDS.strategic) {
+            if (lower.includes(kw)) {
+                category = 'Kebijakan/Program';
+                break;
+            }
+        }
+    }
+
+    if (threatLevel === 'blue' && ['perang', 'geopolitik'].some(w => lower.includes(w))) {
+        category = 'Geopolitik';
+    }
+
+    return { threatLevel, category };
+}
+
 const RSS_FEEDS = {
     'Kab. Pasuruan': 'https://news.google.com/rss/search?q=pasuruan+OR+bangil+OR+pandaan+when:1d&hl=id&gl=ID&ceid=ID:id',
     'Jawa Timur': 'https://news.google.com/rss/search?q=jawa+timur+OR+jatim+when:1d&hl=id&gl=ID&ceid=ID:id',
@@ -193,95 +250,234 @@ const RSS_FEEDS = {
     'Global': 'https://news.google.com/rss/search?q=internasional+when:1d&hl=id&gl=ID&ceid=ID:id'
 };
 
-const THREAT_KEYWORDS = ['demo', 'unjuk rasa', 'bentrok', 'tawuran', 'hoaks', 'provokasi', 'ricuh', 'korupsi', 'pembunuhan', 'carok', 'kriminal', 'pencurian', 'begal', 'narkoba', 'kerusuhan', 'penipuan', 'teroris', 'radikal', 'kecelakaan', 'kebakaran'];
-
-function analyzeThreat(text) {
-    const lower = text.toLowerCase();
-    let threatLevel = 'blue'; // Normal/Pantauan
-    let category = 'Sosial';
-    
-    for (const kw of THREAT_KEYWORDS) {
-        if (lower.includes(kw)) {
-            if (['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran'].includes(kw)) {
-                threatLevel = 'red';
-                category = 'Kamtibmas';
-            } else if (['hoaks', 'provokasi', 'radikal', 'teroris'].includes(kw)) {
-                threatLevel = 'amber';
-                category = 'Siber/Teror';
-            } else {
-                threatLevel = 'amber';
-                category = 'Kriminal';
-            }
-            break;
-        }
-    }
-    return { threatLevel, category };
-}
-
 let pollingInterval = null;
 const API_BASE = "";
 
 function initRealtimeData() {
     const regionSelect = document.getElementById('region-select');
-    
-    // Initial fetch
+
+    // Initial fetch — all data
     fetchDashboardData(regionSelect.value, false);
+    fetchDashboardStatus();
+    fetchThreatTicker();
+    fetchAIRecommendation();
     fetchSocialData();
     fetchNewsData();
+    fetchMediaStats();
     fetchThreatAlerts();
-    
-    // Listen for changes
+    fetchMapMarkers();
+
     regionSelect.addEventListener('change', (e) => {
         fetchDashboardData(e.target.value, false);
     });
 
-    // Start Polling
+    // Polling every 30 seconds (reduced from 10s to avoid overload)
     if (pollingInterval) clearInterval(pollingInterval);
     pollingInterval = setInterval(() => {
         fetchDashboardData(regionSelect.value, true);
+        fetchDashboardStatus();
         fetchSocialData();
         fetchNewsData();
+        fetchMediaStats();
         fetchThreatAlerts();
-    }, 10000); // Poll every 10 seconds
+        fetchMapMarkers();
+    }, 30000);
+
+    // Ticker + AI recommendation refresh every 60 seconds
+    setInterval(() => {
+        fetchThreatTicker();
+        fetchAIRecommendation();
+    }, 60000);
 }
 
+// --- DASHBOARD STATUS (replaces hardcoded SIAGA/124/7) ---
+async function fetchDashboardStatus() {
+    try {
+        const res = await fetch(`${API_BASE}/api/v1/dashboard/status`);
+        const data = await res.json();
+
+        // Update status text and colors
+        const statusText = document.getElementById('status-text');
+        const statusIcon = document.getElementById('status-icon');
+        const statusWrapper = document.getElementById('status-icon-wrapper');
+
+        if (statusText) {
+            statusText.textContent = data.status;
+            statusText.className = `text-3xl font-bold text-accent-${data.statusColor}`;
+        }
+
+        if (statusWrapper) {
+            statusWrapper.className = `w-12 h-12 rounded-full border-4 border-accent-${data.statusColor} border-t-transparent animate-spin flex items-center justify-center relative`;
+        }
+
+        if (statusIcon) {
+            const icons = { AMAN: 'ph-shield-check', WASPADA: 'ph-warning', SIAGA: 'ph-warning-octagon' };
+            statusIcon.className = `ph-fill ${icons[data.status] || 'ph-shield-check'} text-accent-${data.statusColor} text-lg absolute`;
+        }
+
+        // Update counters
+        const countActive = document.getElementById('count-active-issues');
+        const countThreats = document.getElementById('count-high-threats');
+        if (countActive) countActive.textContent = data.active_issues;
+        if (countThreats) countThreats.textContent = data.high_threats;
+
+        // Update threat bars
+        const barProv = document.getElementById('bar-provokasi');
+        const barHoaks = document.getElementById('bar-hoaks');
+        const barKrim = document.getElementById('bar-kriminal');
+        if (barProv) barProv.style.width = `${data.threat_bars.provokasi}%`;
+        if (barHoaks) barHoaks.style.width = `${data.threat_bars.hoaks}%`;
+        if (barKrim) barKrim.style.width = `${data.threat_bars.kriminal}%`;
+
+        const pctProv = document.getElementById('bar-provokasi-pct');
+        const pctHoaks = document.getElementById('bar-hoaks-pct');
+        const pctKrim = document.getElementById('bar-kriminal-pct');
+        if (pctProv) pctProv.textContent = `${data.threat_bars.provokasi}%`;
+        if (pctHoaks) pctHoaks.textContent = `${data.threat_bars.hoaks}%`;
+        if (pctKrim) pctKrim.textContent = `${data.threat_bars.kriminal}%`;
+
+    } catch (e) {
+        console.warn("Dashboard status fetch error:", e);
+    }
+}
+
+// --- THREAT TICKER (replaces hardcoded marquee) ---
+async function fetchThreatTicker() {
+    try {
+        const res = await fetch(`${API_BASE}/api/v1/threat-feed`);
+        const data = await res.json();
+        const ticker = document.getElementById('threat-ticker');
+        if (ticker && data.feeds && data.feeds.length > 0) {
+            ticker.textContent = data.feeds.join('  |  ');
+        }
+    } catch (e) {
+        console.warn("Threat ticker fetch error:", e);
+    }
+}
+
+// --- AI RECOMMENDATION (replaces hardcoded text) ---
+async function fetchAIRecommendation() {
+    try {
+        const res = await fetch(`${API_BASE}/api/v1/ai/recommendation`);
+        const data = await res.json();
+
+        const box = document.getElementById('ai-recommendation-box');
+        const text = document.getElementById('ai-recommendation-text');
+
+        if (box && text) {
+            let kwHtml = '';
+            if (data.keywords && data.keywords.length > 0) {
+                kwHtml = data.keywords.map(k => `<span class="text-white bg-dark-900 px-1 rounded border border-gray-700">${k}</span>`).join(' ');
+            }
+
+            text.innerHTML = `${data.preventif}`;
+
+            if (kwHtml) {
+                text.innerHTML += `<br><span class="text-[9px] text-gray-500 font-mono mt-1 block">Keywords: ${kwHtml}</span>`;
+            }
+        }
+    } catch (e) {
+        console.warn("AI recommendation fetch error:", e);
+    }
+}
+
+// --- MEDIA STATS (replaces hardcoded Warta Bromo 142 etc) ---
+async function fetchMediaStats() {
+    try {
+        const res = await fetch(`${API_BASE}/api/v1/analytics/media-stats`);
+        const data = await res.json();
+
+        // Update News page total articles
+        const totalEl = document.getElementById('news-total-articles');
+        if (totalEl) totalEl.textContent = data.total || 0;
+
+        // Update Media Teraktif
+        const container = document.getElementById('media-active-stats');
+        if (container && data.stats && data.stats.length > 0) {
+            container.innerHTML = data.stats.slice(0, 5).map(s => `
+                <div class="flex justify-between items-center"><span class="text-white truncate">${s.source}</span><span class="text-accent-blue">${s.count}</span></div>
+                <div class="w-full bg-dark-900 h-1 mb-2">
+                    <div class="bg-accent-blue h-1 transition-all" style="width: ${s.percentage}%"></div>
+                </div>
+            `).join('');
+        } else if (container) {
+            container.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-2">Belum ada data media.</p>';
+        }
+    } catch (e) {
+        console.warn("Media stats fetch error:", e);
+    }
+}
+
+// --- EWS ALERTS (replaces hardcoded threat alerts) ---
+async function fetchThreatAlerts() {
+    try {
+        const res = await fetch(`${API_BASE}/api/v1/alerts/active`);
+        const alerts = await res.json();
+
+        const container = document.getElementById('ews-alerts-container');
+        if (container && alerts && alerts.length > 0) {
+            container.innerHTML = alerts.map(a => {
+                const isRed = ['Merah', 'Tinggi'].includes(a.severity_level);
+                const colorClass = isRed ? 'accent-red' : 'accent-amber';
+                const time = new Date(a.created_at);
+                const timeStr = time.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+
+                return `
+                <div class="bg-${colorClass}/10 border border-${colorClass}/50 p-2.5 rounded hover:bg-${colorClass}/20 transition-colors cursor-pointer">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[9px] font-bold text-${colorClass} bg-${colorClass}/20 px-1 rounded uppercase">${a.category || 'ANCAMAN'}</span>
+                        <span class="text-[8px] text-gray-400 font-mono">${timeStr}</span>
+                    </div>
+                    <p class="text-xs font-bold text-white mb-1">${a.title}</p>
+                    <p class="text-[10px] text-gray-300 line-clamp-2">${a.description || ''}</p>
+                    <div class="mt-2 text-[8px] font-mono flex gap-2">
+                        <span class="text-gray-400"><i class="ph-fill ph-crosshair"></i> ${a.region || ''}</span>
+                        <span class="text-${colorClass}">Level: ${a.severity_level}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        } else if (container) {
+            container.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4 font-mono">✅ Tidak ada ancaman aktif saat ini.</p>';
+        }
+    } catch (e) {
+        console.warn("EWS alerts fetch error:", e);
+    }
+}
+
+// --- MAIN DASHBOARD DATA FETCHER ---
 async function fetchDashboardData(region, isSilent = false) {
     const container = document.getElementById('top-issues-container');
     const osintContainer = document.getElementById('osint-feed');
-    
+
     if (!isSilent) {
         container.innerHTML = '<div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-blue text-2xl"></i><p class="text-xs text-gray-500 mt-2 font-mono">LOADING DATA...</p></div>';
         osintContainer.innerHTML = '<div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-emerald text-2xl"></i></div>';
     }
-    
+
     try {
-        // Fetch Top Issues from Node.js API
         const topRes = await fetch(`${API_BASE}/api/v1/incidents/top?region=${encodeURIComponent(region)}`);
         if (!topRes.ok) throw new Error("Server response not ok");
         const topIssues = await topRes.json();
-        
-        // Fetch Summary
+
         const sumRes = await fetch(`${API_BASE}/api/v1/dashboard/summary`);
         const summary = await sumRes.json();
-        
-        // Update main dashboard metrics
-        const statActive = document.getElementById('stat-active-issues');
-        if (statActive) statActive.innerText = summary.active_issues || 0;
-        
-        const statThreat = document.getElementById('stat-threat-level');
-        if (statThreat) statThreat.innerText = summary.status || 'AMAN';
-        
-        const statOsint = document.getElementById('stat-total-osint');
-        if (statOsint) statOsint.innerText = summary.total_articles || 0;
-        
-        // Update Dashboard Main Status
-        document.getElementById('status-aman').classList.replace('bg-accent-emerald', 'bg-gray-800');
-        document.getElementById('status-waspada').classList.replace('bg-accent-amber', 'bg-gray-800');
-        document.getElementById('status-siaga').classList.replace('bg-accent-red', 'bg-gray-800');
-        
-        if (summary.status === 'AMAN') document.getElementById('status-aman').classList.replace('bg-gray-800', 'bg-accent-emerald');
-        else if (summary.status === 'WASPADA') document.getElementById('status-waspada').classList.replace('bg-gray-800', 'bg-accent-amber');
-        else if (summary.status === 'SIAGA') document.getElementById('status-siaga').classList.replace('bg-gray-800', 'bg-accent-red');
+
+        // Update sentiment score display
+        const sentScore = document.getElementById('sentiment-score');
+        const sentLabel = document.getElementById('sentiment-label');
+        if (sentScore) {
+            const dominant = Math.max(summary.sentiment.negative, summary.sentiment.positive, summary.sentiment.neutral);
+            sentScore.textContent = `${dominant}%`;
+        }
+        if (sentLabel) {
+            if (summary.sentiment.negative >= summary.sentiment.positive && summary.sentiment.negative >= summary.sentiment.neutral) {
+                sentLabel.textContent = 'Negatif';
+            } else if (summary.sentiment.positive >= summary.sentiment.neutral) {
+                sentLabel.textContent = 'Positif';
+            } else {
+                sentLabel.textContent = 'Netral';
+            }
+        }
 
         // Update Sentiment Chart
         if (window.sentimentChartInstance) {
@@ -300,19 +496,18 @@ async function fetchDashboardData(region, isSilent = false) {
             ];
             window.newsSentimentChartInstance.update();
         }
-        
+
         let htmlTop = '';
         topIssues.forEach(item => {
             const isUp = Math.random() > 0.3;
             const trendStr = (isUp ? '+' : '-') + (Math.floor(Math.random() * 50) + 1) + '%';
-            
+
             let iconColor = 'text-accent-blue';
             let bgIcon = 'bg-accent-blue/10';
-            if(item.severity_level === 'Merah') { iconColor = 'text-accent-red'; bgIcon = 'bg-accent-red/10'; }
-            else if(item.severity_level === 'Oranye') { iconColor = 'text-accent-amber pulse-red'; bgIcon = 'bg-accent-red/10'; }
-            else if(item.severity_level === 'Kuning') { iconColor = 'text-accent-amber'; bgIcon = 'bg-accent-amber/10'; }
-            else if(item.severity_level === 'Tinggi') { iconColor = 'text-accent-red'; bgIcon = 'bg-accent-red/10'; } // fallback old schema
-            
+            if (['Merah', 'Tinggi'].includes(item.severity_level)) { iconColor = 'text-accent-red'; bgIcon = 'bg-accent-red/10'; }
+            else if (item.severity_level === 'Oranye') { iconColor = 'text-accent-amber pulse-red'; bgIcon = 'bg-accent-red/10'; }
+            else if (item.severity_level === 'Kuning') { iconColor = 'text-accent-amber'; bgIcon = 'bg-accent-amber/10'; }
+
             htmlTop += `
             <div class="flex items-center justify-between p-2 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-500 transition-colors cursor-pointer">
                 <div class="flex items-center gap-3">
@@ -321,7 +516,7 @@ async function fetchDashboardData(region, isSilent = false) {
                     </div>
                     <div>
                         <p class="text-[11px] font-bold text-white leading-tight line-clamp-2">${item.title}</p>
-                        <p class="text-[9px] text-gray-500 font-mono mt-0.5">${item.category}</p>
+                        <p class="text-[9px] text-gray-500 font-mono mt-0.5">${item.category} <span class="text-accent-cyan text-[8px] border border-accent-cyan/30 px-1 rounded ml-1">LIVE</span></p>
                     </div>
                 </div>
                 <div class="text-right shrink-0">
@@ -329,36 +524,30 @@ async function fetchDashboardData(region, isSilent = false) {
                 </div>
             </div>`;
         });
-        
+
         // Fetch Recent OSINT
         const osintRes = await fetch(`${API_BASE}/api/v1/osint`);
         const osintData = await osintRes.json();
-        
+
         let htmlOsint = '';
         if (osintData && osintData.length > 0) {
             osintData.forEach(item => {
                 htmlOsint += renderOsintItem(item);
             });
         } else {
-            // Fallback mock if db is empty
-            htmlOsint = `
-            <div class="p-2.5 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-600 transition-colors">
-                <p class="text-[11px] text-gray-300 italic mb-2">Belum ada data OSINT di database.</p>
-            </div>`;
+            htmlOsint = `<div class="p-2.5 rounded bg-dark-900 border border-gray-700/50"><p class="text-[11px] text-gray-300 italic mb-2">Belum ada data OSINT di database.</p></div>`;
         }
-        
+
         container.innerHTML = htmlTop || '<p class="text-xs text-gray-500 text-center py-4">Tidak ada data ditemukan.</p>';
         osintContainer.innerHTML = htmlOsint;
-        
+
     } catch (error) {
-        console.warn("Lokal Node.js Backend tidak aktif. Mengaktifkan Mode Fallback...");
-        // FALLBACK TO PUBLIC RSS MODE (Phase 1 Logic)
+        console.warn("API Backend tidak aktif. Mengaktifkan Mode RSS Fallback...");
         fetchFallbackRSS(region, container, osintContainer);
     }
 }
 
-// --- DYNAMIC DATA FETCHERS (PHASE 3) ---
-
+// --- SOCIAL DATA FETCHER ---
 async function fetchSocialData() {
     try {
         const [kwdRes, srcRes, critRes] = await Promise.all([
@@ -366,15 +555,15 @@ async function fetchSocialData() {
             fetch(`${API_BASE}/api/v1/analytics/sources`),
             fetch(`${API_BASE}/api/v1/analytics/critical`)
         ]);
-        
+
         const keywords = await kwdRes.json();
         const sources = await srcRes.json();
         const criticals = await critRes.json();
-        
+
         // Render Keywords
         const kwdList = document.getElementById('analytics-keywords-list');
         const dashKwdList = document.getElementById('trending-keywords-dashboard');
-        
+
         if (keywords.length > 0) {
             const kwdHTML = keywords.map(k => `
                 <div class="p-2 rounded bg-dark-900 border border-gray-700 flex justify-between items-center hover:border-gray-500 transition-colors">
@@ -382,11 +571,10 @@ async function fetchSocialData() {
                     <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} mentions</span>
                 </div>
             `).join('');
-            
+
             if (kwdList) kwdList.innerHTML = kwdHTML;
-            
+
             if (dashKwdList) {
-                // Add trend arrows for dashboard view to look more dynamic
                 dashKwdList.innerHTML = keywords.slice(0, 5).map((k, i) => {
                     const isUp = Math.random() > 0.3;
                     const color = isUp ? 'text-accent-emerald' : 'text-accent-amber';
@@ -394,7 +582,7 @@ async function fetchSocialData() {
                     return `
                     <div class="p-2 rounded bg-dark-900 border border-gray-700/50 flex justify-between items-center hover:border-gray-500 transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
-                            <span class="text-[10px] font-mono text-gray-500 w-4">${i+1}.</span>
+                            <span class="text-[10px] font-mono text-gray-500 w-4">${i + 1}.</span>
                             <span class="text-xs font-bold text-white">#${k.word.toUpperCase()}</span>
                         </div>
                         <div class="flex items-center gap-3">
@@ -404,8 +592,11 @@ async function fetchSocialData() {
                     </div>`;
                 }).join('');
             }
+        } else {
+            if (kwdList) kwdList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data kata kunci.</p>';
+            if (dashKwdList) dashKwdList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data trending.</p>';
         }
-        
+
         // Render Sources
         const srcList = document.getElementById('analytics-sources-list');
         if (srcList && sources.length > 0) {
@@ -419,6 +610,8 @@ async function fetchSocialData() {
                     </div>
                 </div>
             `).join('');
+        } else if (srcList) {
+            srcList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data sumber berita.</p>';
         }
 
         // Render Critical Articles
@@ -439,27 +632,32 @@ async function fetchSocialData() {
                     </div>
                 </div>
             `).join('');
+        } else if (critList) {
+            critList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Tidak ada artikel kritis (Sentimen Negatif).</p>';
         }
     } catch (e) {
         console.error("Analytics fetch error:", e);
     }
 }
 
+// --- NEWS DATA FETCHER ---
 async function fetchNewsData() {
     try {
         const res = await fetch(`${API_BASE}/api/v1/osint`);
         const news = await res.json();
-        
+
         const newsList = document.getElementById('news-list');
         if (newsList && news.length > 0) {
             newsList.innerHTML = news.map(n => {
                 const borderClass = n.sentiment_label === 'Negatif' ? 'border-accent-red' : (n.sentiment_label === 'Positif' ? 'border-accent-emerald' : 'border-accent-blue');
+                const time = new Date(n.created_at);
+                const timeStr = time.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 return `
                 <div class="bg-dark-900 border-l-2 ${borderClass} p-3 rounded border border-gray-700/50 hover:bg-gray-800 transition-colors flex gap-3 cursor-pointer">
                     <div class="flex-1">
                         <div class="flex gap-2 items-center mb-1">
                             <span class="text-[9px] font-bold text-gray-300 uppercase">${n.source_user || 'News'}</span>
-                            <span class="text-[8px] text-gray-500 font-mono">&bull; Baru Saja</span>
+                            <span class="text-[8px] text-gray-500 font-mono">&bull; ${timeStr}</span>
                             <span class="text-[8px] border border-gray-600 px-1 rounded text-gray-400 ml-auto">${n.sentiment_label}</span>
                         </div>
                         <p class="text-sm font-bold text-white mb-1 line-clamp-1">${n.content}</p>
@@ -467,124 +665,75 @@ async function fetchNewsData() {
                     </div>
                 </div>
             `}).join('');
+        } else if (newsList) {
+            newsList.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Belum ada data berita.</p>';
         }
     } catch (e) {}
 }
 
-async function fetchThreatAlerts() {
-    try {
-        const res = await fetch(`${API_BASE}/api/v1/alerts/active`);
-        const alerts = await res.json();
-        
-        // Asumsi HTML struktur untuk alert list ada di #view-threat .flex-1.overflow-y-auto...
-        const alertContainers = document.querySelectorAll('#view-threat .flex-1.overflow-y-auto.space-y-3.pr-1');
-        if (alertContainers.length > 0 && alerts.length > 0) {
-            const container = alertContainers[0]; // Active Threat Alerts div
-            container.innerHTML = alerts.map(a => `
-                <div class="${a.severity_level === 'Merah' ? 'bg-accent-red/10 border-accent-red/50' : 'bg-accent-amber/10 border-accent-amber/50'} border p-2.5 rounded hover:bg-gray-800 transition-colors cursor-pointer">
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-[9px] font-bold ${a.severity_level === 'Merah' ? 'text-accent-red bg-accent-red/20' : 'text-accent-amber bg-accent-amber/20'} px-1 rounded uppercase">${a.category}</span>
-                        <span class="text-[8px] text-gray-400 font-mono">Real-time</span>
-                    </div>
-                    <p class="text-xs font-bold text-white mb-1">${a.title}</p>
-                    <p class="text-[10px] text-gray-300 line-clamp-2">${a.description}</p>
-                    <div class="mt-2 text-[8px] font-mono flex gap-2">
-                        <span class="text-gray-400"><i class="ph-fill ph-crosshair"></i> ${a.region}</span>
-                        <span class="${a.severity_level === 'Merah' ? 'text-accent-red' : 'text-accent-amber'}">Level: ${a.severity_level}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-    } catch (e) {}
-}
-
+// --- FALLBACK RSS (server-side proxy, no CORS issues) ---
 async function fetchFallbackRSS(region, container, osintContainer) {
-    const CORS_PROXIES = [
-        "https://corsproxy.io/?",
-        "https://api.codetabs.com/v1/proxy?quest=",
-        "https://api.allorigins.win/get?url="
-    ];
-    
-    const RSS_FEEDS = {
-        'Kab. Pasuruan': 'https://news.google.com/rss/search?q=pasuruan+OR+bangil+OR+pandaan+when:1d&hl=id&gl=ID&ceid=ID:id',
-        'Jawa Timur': 'https://news.google.com/rss/search?q=jawa+timur+OR+jatim+when:1d&hl=id&gl=ID&ceid=ID:id',
-        'Nasional': 'https://news.google.com/rss/search?q=indonesia+kriminal+OR+politik+when:1d&hl=id&gl=ID&ceid=ID:id',
-        'Global': 'https://news.google.com/rss/search?q=internasional+when:1d&hl=id&gl=ID&ceid=ID:id'
-    };
-    
-    const url = RSS_FEEDS[region];
+    const feedUrl = RSS_FEEDS[region];
     try {
-        let xmlString = null;
-        for (const proxy of CORS_PROXIES) {
-            try {
-                const response = await fetch(proxy + encodeURIComponent(url));
-                if (!response.ok) continue;
-                
-                const textData = await response.text();
-                xmlString = proxy.includes('allorigins') ? JSON.parse(textData).contents : textData;
-                if (xmlString) break;
-            } catch (e) {}
+        const proxyUrl = `${API_BASE}/api/v1/rss-proxy?url=${encodeURIComponent(feedUrl)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error(`RSS proxy returned ${response.status}`);
+
+        const data = await response.json();
+        if (!data.success || !data.items || data.items.length === 0) {
+            throw new Error("No items returned from RSS proxy");
         }
 
-        if (!xmlString) throw new Error("All CORS proxies failed.");
-
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlString, "text/xml");
-        const items = Array.from(xml.querySelectorAll("item"));
-        
+        const items = data.items;
         let htmlTop = '';
         let htmlOsint = '';
-        
-        const topIssues = items.slice(0, 8);
-        const osintFeeds = items.slice(0, 15);
-        
-        topIssues.forEach(item => {
-            let title = item.querySelector("title")?.textContent || "";
-            title = title.replace(/ - .*/, '');
+
+        items.slice(0, 8).forEach(item => {
+            let title = (item.title || "").replace(/ - .*/, '');
             const analysis = analyzeThreat(title);
             const isUp = Math.random() > 0.3;
             const trendStr = (isUp ? '+' : '-') + (Math.floor(Math.random() * 50) + 1) + '%';
-            
             const iconColor = analysis.threatLevel === 'red' ? 'text-accent-red' : analysis.threatLevel === 'amber' ? 'text-accent-amber' : 'text-accent-blue';
             const bgIcon = analysis.threatLevel === 'red' ? 'bg-accent-red/10' : analysis.threatLevel === 'amber' ? 'bg-accent-amber/10' : 'bg-accent-blue/10';
-            
-            htmlTop += `
-            <div class="flex items-center justify-between p-2 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-500 transition-colors cursor-pointer relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-1.5 h-full ${analysis.threatLevel === 'red' ? 'bg-accent-red' : 'bg-transparent'}"></div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded ${bgIcon} flex items-center justify-center shrink-0">
-                        <i class="ph-fill ph-hash ${iconColor}"></i>
+
+            // Only show red/amber or Geopolitik/Kebijakan in Top Issues
+            if (['red', 'amber'].includes(analysis.threatLevel) || ['Geopolitik', 'Kebijakan/Program'].includes(analysis.category)) {
+                htmlTop += `
+                <div class="flex items-center justify-between p-2 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-500 transition-colors cursor-pointer relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-1.5 h-full ${analysis.threatLevel === 'red' ? 'bg-accent-red' : 'bg-transparent'}"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded ${bgIcon} flex items-center justify-center shrink-0">
+                            <i class="ph-fill ph-hash ${iconColor}"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold text-white leading-tight line-clamp-2">${title}</p>
+                            <p class="text-[9px] text-gray-500 font-mono mt-0.5">${analysis.category} <span class="text-accent-cyan text-[8px] border border-accent-cyan/30 px-1 rounded ml-1">RSS</span></p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-[11px] font-bold text-white leading-tight line-clamp-2">${title}</p>
-                        <p class="text-[9px] text-gray-500 font-mono mt-0.5">${analysis.category} <span class="text-accent-amber text-[8px] border border-accent-amber/30 px-1 rounded ml-1">FALLBACK</span></p>
+                    <div class="text-right shrink-0">
+                        <p class="text-[10px] ${isUp ? 'text-accent-red' : 'text-accent-emerald'} font-mono">${trendStr}</p>
                     </div>
-                </div>
-                <div class="text-right shrink-0">
-                    <p class="text-[10px] ${isUp ? 'text-accent-red' : 'text-accent-emerald'} font-mono">${trendStr}</p>
-                </div>
-            </div>`;
+                </div>`;
+            }
         });
-        
-        osintFeeds.forEach((item, index) => {
-            let title = item.querySelector("title")?.textContent || "";
-            const source = title.split(' - ').pop() || "Internet";
-            title = title.replace(/ - .*/, '');
+
+        items.slice(0, 15).forEach(item => {
+            let title = (item.title || "").replace(/ - .*/, '');
+            const source = item.source || (item.title || "").split(' - ').pop() || "Internet";
             const analysis = analyzeThreat(title);
             let sentiment = 'Netral';
             let sentimentColor = 'text-gray-400 border-gray-600 bg-gray-800';
-            
             if (analysis.threatLevel === 'red') { sentiment = 'Kritis'; sentimentColor = 'text-accent-red border-accent-red/30 bg-accent-red/10'; }
             else if (analysis.threatLevel === 'amber') { sentiment = 'Waspada'; sentimentColor = 'text-accent-amber border-accent-amber/30 bg-accent-amber/10'; }
-            
+
             htmlOsint += `
             <div class="p-2.5 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-600 transition-colors mb-2">
                 <div class="flex items-center justify-between mb-1.5">
                     <div class="flex items-center gap-1.5">
                         <i class="ph-fill ph-globe text-accent-emerald text-sm"></i>
-                        <span class="text-[9px] text-gray-500 uppercase font-mono">WEB NEWS (FALLBACK)</span>
+                        <span class="text-[9px] text-gray-500 uppercase font-mono">WEB NEWS (RSS)</span>
                     </div>
-                    <span class="text-[9px] text-gray-600 font-mono">Baru saja</span>
+                    <span class="text-[9px] text-gray-600 font-mono">${item.pubDate ? new Date(item.pubDate).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}</span>
                 </div>
                 <p class="text-[11px] text-gray-300 italic mb-2 line-clamp-2">" ${title} "</p>
                 <div class="flex justify-between items-center mt-2 border-t border-gray-800 pt-2">
@@ -593,14 +742,14 @@ async function fetchFallbackRSS(region, container, osintContainer) {
                 </div>
             </div>`;
         });
-        
+
         container.innerHTML = htmlTop || '<p class="text-xs text-gray-500 text-center py-4">Tidak ada data ditemukan.</p>';
         osintContainer.innerHTML = htmlOsint || '<p class="text-xs text-gray-500 text-center py-4">Tidak ada data ditemukan.</p>';
-        
+
     } catch (error) {
         console.error("Fallback RSS Error:", error);
-        container.innerHTML = '<p class="text-xs text-accent-red text-center py-4">Sistem Backend Offline & Proxy Diblokir.</p>';
-        osintContainer.innerHTML = '<p class="text-xs text-accent-red text-center py-4">Silakan install Node.js dan jalankan run.bat</p>';
+        container.innerHTML = '<p class="text-xs text-accent-red text-center py-4">Sistem Backend Offline. Periksa koneksi API.</p>';
+        osintContainer.innerHTML = '<p class="text-xs text-accent-red text-center py-4">Silakan periksa deployment Vercel atau jalankan run.bat secara lokal</p>';
     }
 }
 
@@ -611,15 +760,16 @@ function renderOsintItem(item) {
         'TikTok': { icon: 'ph-tiktok-logo', color: 'text-white' },
         'News': { icon: 'ph-globe', color: 'text-accent-emerald' }
     };
-    
+
     const platform = platforms[item.platform] || platforms['News'];
-    const timeAgo = "Baru saja";
+    const time = item.created_at ? new Date(item.created_at) : null;
+    const timeStr = time ? time.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja';
     const title = item.content || item.title || "No content";
-    
+
     let sentimentColor = 'text-gray-400 border-gray-600 bg-gray-800';
     if (item.sentiment_label === 'Negatif') sentimentColor = 'text-accent-red border-accent-red/30 bg-accent-red/10';
     else if (item.sentiment_label === 'Positif') sentimentColor = 'text-accent-emerald border-accent-emerald/30 bg-accent-emerald/10';
-    
+
     return `
     <div class="p-2.5 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-600 transition-colors mb-2">
         <div class="flex items-center justify-between mb-1.5">
@@ -627,7 +777,7 @@ function renderOsintItem(item) {
                 <i class="ph-fill ${platform.icon} ${platform.color} text-sm"></i>
                 <span class="text-[9px] text-gray-500 uppercase font-mono">${item.platform || 'System'}</span>
             </div>
-            <span class="text-[9px] text-gray-600 font-mono">${timeAgo}</span>
+            <span class="text-[9px] text-gray-600 font-mono">${timeStr}</span>
         </div>
         <p class="text-[11px] text-gray-300 italic mb-2 line-clamp-2">" ${title} "</p>
         <div class="flex justify-between items-center mt-2 border-t border-gray-800 pt-2">

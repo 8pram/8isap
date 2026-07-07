@@ -1,0 +1,9 @@
+SUPABASE_URL
+
+https://ifhqunmwsrnlcyfkzzcs.supabase.co
+
+
+SUPABASE_ANON_KEY
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmaHF1bm13c3JubGN5Zmt6emNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzOTUwMzEsImV4cCI6MjA5ODk3MTAzMX0._V5-WG5xTy0yWoU0SIh8WbAcwb3SGI6ne3FKanF4wuI
+

@@ -5,7 +5,9 @@ const sentimentAnalyzer = new Sentiment();
 
 const THREAT_KEYWORDS = {
     red: ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran'],
-    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'konflik']
+    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
+    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu'],
+    geopolitik: ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global']
 };
 
 const RSS_SOURCES = {
@@ -42,8 +44,22 @@ function analyzeText(text) {
         }
     }
 
-    if (threatLevel === 'blue' && ['perang', 'konflik', 'geopolitik', 'pemerintah'].some(w => lowerText.includes(w))) {
-        category = 'Geopolitik';
+    if (threatLevel === 'blue') {
+        for (const word of THREAT_KEYWORDS.strategic) {
+            if (lowerText.includes(word)) {
+                category = 'Kebijakan/Program';
+                break;
+            }
+        }
+    }
+
+    if (threatLevel === 'blue') {
+        for (const word of THREAT_KEYWORDS.geopolitik) {
+            if (lowerText.includes(word)) {
+                category = 'Geopolitik';
+                break;
+            }
+        }
     }
 
     let score = sentimentAnalyzer.analyze(text).score;
@@ -106,8 +122,8 @@ async function fetchAndProcessRSS(supabase) {
                 const cleanTitle = title.split(' - ')[0] || title;
                 const analysis = analyzeText(cleanTitle);
 
-                // 1. Insert to incidents if critical
-                if (['red', 'amber'].includes(analysis.threatLevel) || analysis.category === 'Geopolitik') {
+                // 1. Insert to incidents if critical OR strategic
+                if (['red', 'amber'].includes(analysis.threatLevel) || ['Geopolitik', 'Kebijakan/Program'].includes(analysis.category)) {
                     const { data: existing } = await supabase.from('incidents').select('id').eq('title', cleanTitle);
 
                     if (!existing || existing.length === 0) {

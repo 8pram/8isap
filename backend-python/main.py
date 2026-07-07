@@ -1,12 +1,21 @@
 import os
+import sys
+# pyrefly: ignore [missing-import]
 import requests
 import xml.etree.ElementTree as ET
-from fastapi import FastAPI, BackgroundTasks
+# pyrefly: ignore [missing-import]
+from fastapi import FastAPI
+# pyrefly: ignore [missing-import]
 from pydantic import BaseModel
+# pyrefly: ignore [missing-import]
 from textblob import TextBlob
+# pyrefly: ignore [missing-import]
 from apscheduler.schedulers.background import BackgroundScheduler
+# pyrefly: ignore [missing-import]
 from apscheduler.triggers.interval import IntervalTrigger
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
+# pyrefly: ignore [missing-import]
 from supabase import create_client, Client
 import random
 
@@ -31,15 +40,20 @@ app = FastAPI()
 
 THREAT_KEYWORDS = {
     'red': ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran'],
-    'amber': ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'konflik']
+    'amber': ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
+    'strategic': ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu'],
+    'geopolitik': ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global']
 }
 
-RSS_SOURCES = {
-    'Kab. Pasuruan': 'https://news.google.com/rss/search?q=pasuruan+OR+bangil+OR+pandaan+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Jawa Timur': 'https://news.google.com/rss/search?q=jawa+timur+OR+jatim+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Berita Nasional (Targeted)': 'https://news.google.com/rss/search?q=(indonesia)+AND+(cnn+OR+detik+OR+kompas+OR+tempo+OR+liputan6+OR+inews+OR+tvone+OR+jawa+pos+OR+tribun+OR+antara)+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Berita Lokal (Targeted)': 'https://news.google.com/rss/search?q=(pasuruan)+AND+(warta+bromo+OR+radar+bromo+OR+memorandum+OR+kabar+pasuruan)+when:1d&hl=id&gl=ID&ceid=ID:id'
-}
+RSS_SOURCES = [
+    ('Kab. Pasuruan', 'https://news.google.com/rss/search?q=(pasuruan+OR+bangil+OR+pandaan)+AND+(site:meri.co.id+OR+site:pojokkiripasuruannews.com+OR+site:smnnews.co.id+OR+site:radarjatim.id+OR+site:pasuruannews.com+OR+site:pasuruan.times.co.id+OR+site:pantura7.com+OR+site:wartabromo.com+OR+site:kabarnusa.id)+when:1d&hl=id&gl=ID&ceid=ID:id'),
+    ('Jawa Timur', 'https://news.google.com/rss/search?q=(jawa+timur+OR+jatim)+AND+(site:kabarjawatimur.com+OR+site:beritajatim.com+OR+site:jurnaljatim.com+OR+site:jatimnow.com+OR+site:infojatim.com+OR+site:jatimtimes.com+OR+site:jatim.antaranews.com+OR+site:jawapos.com+OR+site:jatimpos.co+OR+site:detik.com+OR+site:jatimnet.com+OR+site:bangsaonline.com+OR+site:surabaya.tribunnews.com+OR+site:jatimmedia.com+OR+site:jatimupdate.id+OR+site:mediajatim.com)+when:1d&hl=id&gl=ID&ceid=ID:id'),
+    ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(site:inews.id+OR+site:tvrinews.com+OR+site:rri.co.id+OR+site:jpnn.com+OR+site:jurnas.com+OR+site:beritasatu.com+OR+site:suarapembaharuan.com+OR+site:rm.id+OR+site:ipol.id+OR+site:kompas.com+OR+site:kumparan.com+OR+site:nusantaratv.com)+when:1d&hl=id&gl=ID&ceid=ID:id'),
+    ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(site:aktual.com+OR+site:idntimes.com+OR+site:antvklik.com+OR+site:elshinta.com+OR+site:inilah.com+OR+site:neraca.co.id+OR+site:koran-jakarta.com+OR+site:tribunnews.com+OR+site:mediaindonesia.com+OR+site:wartaekonomi.co.id+OR+site:detik.com+OR+site:sindonews.com)+when:1d&hl=id&gl=ID&ceid=ID:id'),
+    ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(site:harianterbit.com+OR+site:viva.co.id+OR+site:idxchannel.com+OR+site:suarakarya.id+OR+site:poskota.co+OR+site:suara.com+OR+site:akurat.co+OR+site:sinarharapan.id+OR+site:jakarta.suaramerdeka.com+OR+site:jawapos.com+OR+site:genpi.co)+when:1d&hl=id&gl=ID&ceid=ID:id'),
+    ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(site:cnbcindonesia.com+OR+site:swa.co.id+OR+site:wartakota.tribunnews.com+OR+site:balipost.com+OR+site:liputan6.com+OR+site:okezone.com+OR+site:investor.id+OR+site:antaranews.com+OR+site:tirto.id+OR+site:medcom.id+OR+site:galapos.id)+when:1d&hl=id&gl=ID&ceid=ID:id'),
+    ('Global', 'https://news.google.com/rss/search?q=(internasional+OR+dunia)+AND+(site:inews.id+OR+site:tvrinews.com+OR+site:kompas.com+OR+site:detik.com+OR+site:tribunnews.com+OR+site:cnbcindonesia.com+OR+site:cnnindonesia.com+OR+site:antaranews.com)+when:1d&hl=id&gl=ID&ceid=ID:id')
+]
 
 # ==========================================
 # FUNGSI ANALISIS NLP SEDERHANA
@@ -66,9 +80,17 @@ def analyze_text(text: str):
                     category = 'Kriminal'
                 break
 
-    # Jika tidak ada keyword ancaman, tapi tentang Global/Geopolitik
-    if threat_level == 'blue' and any(w in lower_text for w in ['perang', 'konflik', 'geopolitik', 'pemerintah']):
-        category = 'Geopolitik'
+    if threat_level == 'blue':
+        for word in THREAT_KEYWORDS['strategic']:
+            if word in lower_text:
+                category = 'Kebijakan/Program'
+                break
+
+    if threat_level == 'blue':
+        for word in THREAT_KEYWORDS['geopolitik']:
+            if word in lower_text:
+                category = 'Geopolitik'
+                break
 
     # TextBlob
     blob = TextBlob(text)
@@ -113,7 +135,7 @@ def fetch_and_process_rss():
         print("Database belum terhubung. Operasi dibatalkan.")
         return
 
-    for region, url in RSS_SOURCES.items():
+    for region, url in RSS_SOURCES:
         try:
             print(f"Menyadap region: {region}...")
             response = requests.get(url, timeout=10)
@@ -134,8 +156,8 @@ def fetch_and_process_rss():
                 
                 analysis = analyze_text(clean_title)
                 
-                # Hanya simpan ke 'incidents' jika ada ancaman/krusial
-                if analysis['threat_level'] in ['red', 'amber'] or analysis['category'] == 'Geopolitik':
+                # Hanya simpan ke 'incidents' jika ada ancaman/krusial ATAU isu strategis
+                if analysis['threat_level'] in ['red', 'amber'] or analysis['category'] in ['Geopolitik', 'Kebijakan/Program']:
                     # Cek apakah sudah ada untuk menghindari duplikat (cek berdasarkan judul)
                     existing = supabase.table('incidents').select('id').eq('title', clean_title).execute()
                     if not existing.data:
@@ -188,11 +210,22 @@ def fetch_and_process_rss():
 
     print("[ISAP Scraper] Sapuan selesai.")
 
-# Jalankan Scheduler
+# Inisialisasi scheduler secara global
 scheduler = BackgroundScheduler()
-# Eksekusi setiap 15 menit
-scheduler.add_job(fetch_and_process_rss, IntervalTrigger(minutes=15))
-scheduler.start()
+
+@app.on_event("startup")
+def startup_event():
+    # Eksekusi setiap 15 menit
+    scheduler.add_job(fetch_and_process_rss, IntervalTrigger(minutes=15))
+    scheduler.start()
+
+# Saat aplikasi dimatikan, matikan juga scheduler
+@app.on_event("shutdown")
+def shutdown_event():
+    try:
+        scheduler.shutdown()
+    except:
+        pass
 
 # ==========================================
 # API ENDPOINTS
@@ -215,7 +248,23 @@ def trigger_scrape(region: str = "Semua"):
     fetch_and_process_rss()
     return {"status": "scraping_started", "region": region}
 
-# Saat aplikasi dimatikan, matikan juga scheduler
-@app.on_event("shutdown")
-def shutdown_event():
-    scheduler.shutdown()
+if __name__ == "__main__":
+    import sys
+    
+    # Jika dipanggil dengan argumen --scrape-only (oleh GitHub Actions),
+    # cukup jalankan scraping 1x lalu keluar.
+    if len(sys.argv) > 1 and sys.argv[1] == "--scrape-only":
+        print("[GitHub Actions] Memulai OSINT Scrape Otomatis...")
+        fetch_and_process_rss()
+        sys.exit(0)
+        
+    # Jika dijalankan normal, jalankan server
+    try:
+        print("[ISAP Scraper] Memulai inisialisasi mesin OSINT...")
+        fetch_and_process_rss()
+    except Exception as e:
+        print(f"Error saat scrape awal: {e}")
+
+    # pyrefly: ignore [missing-import]
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

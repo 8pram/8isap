@@ -1,0 +1,491 @@
+# MASTER PROMPT
+
+## INTELLIGENCE SITUATIONAL AWARENESS PLATFORM (ISAP)
+
+### Enterprise AI Intelligence Platform Development Prompt
+
+---
+
+# ROLE
+
+Bertindak sebagai tim multidisiplin yang terdiri dari para profesional berpengalaman (minimal 15 tahun) pada bidang masing-masing, yaitu:
+
+1. Senior Intelligence Analyst
+2. National Security Intelligence Expert
+3. Strategic Intelligence Planner
+4. OSINT Specialist (Open Source Intelligence)
+5. SOCMINT Specialist (Social Media Intelligence)
+6. Cyber Threat Intelligence Analyst
+7. Data Scientist
+8. Artificial Intelligence Engineer
+9. Machine Learning Engineer
+10. Big Data Engineer
+11. Principal Software Architect
+12. Senior Full Stack Developer
+13. Cloud Solution Architect
+14. UI/UX Designer
+15. DevSecOps Engineer
+16. Database Architect
+17. API Integration Specialist
+18. GIS & Geospatial Intelligence Specialist
+19. Dashboard & Data Visualization Expert
+20. Enterprise System Engineer
+
+Seluruh jawaban harus disusun layaknya sebuah proposal teknis profesional sekaligus implementasi nyata yang siap dikembangkan menjadi sistem produksi (production-ready).
+
+---
+
+# MISI
+
+Rancang dan bangun sebuah platform intelijen digital nasional bernama:
+
+# INTELLIGENCE SITUATIONAL AWARENESS PLATFORM (ISAP)
+
+Platform ini berfungsi sebagai pusat monitoring, analisis, deteksi dini, dan penyusunan rekomendasi intelijen berbasis Artificial Intelligence untuk membantu pengambilan keputusan dalam menjaga situasi keamanan dan ketertiban masyarakat (Kamtibmas) tetap aman, kondusif, dan terkendali.
+
+Sistem harus mampu melakukan pemantauan isu secara real-time dari berbagai sumber data yang tersedia secara legal, menganalisis dinamika informasi, mengidentifikasi potensi risiko, serta menyajikan hasil analisis dalam bentuk dashboard intelijen yang modern, interaktif, dan mudah dipahami oleh pengambil keputusan.
+
+---
+
+# TUJUAN SISTEM
+
+Platform harus mampu:
+
+* Monitoring informasi secara real-time.
+* Social Media Intelligence (SOCMINT).
+* Open Source Intelligence (OSINT).
+* News Intelligence Monitoring.
+* Analisis sentimen publik.
+* Analisis tren dan dinamika isu.
+* Deteksi dini potensi gangguan keamanan.
+* Identifikasi penyebaran hoaks dan disinformasi.
+* Analisis jaringan aktor dan influencer.
+* Analisis wilayah rawan.
+* Analisis spasial berbasis GIS.
+* Prediksi eskalasi isu menggunakan AI.
+* Penyusunan rekomendasi intelijen secara otomatis.
+* Menyediakan Executive Intelligence Dashboard untuk pimpinan.
+
+---
+
+# SUMBER DATA
+
+## Media Sosial
+
+* YouTube
+* Facebook
+* Instagram
+* X (Twitter)
+* Threads
+* TikTok
+* Telegram (kanal publik)
+* Reddit
+
+---
+
+## Portal Berita Nasional
+
+* CNN Indonesia
+* DetikNews
+* Kompas
+* Tempo
+* Liputan6
+* Antara
+* iNews
+* TVOne
+* Tribunnews
+* Jawa Pos
+
+---
+
+## Portal Berita Lokal
+
+* Warta Bromo
+* Radar Bromo
+* Kabar Pasuruan
+* Memorandum
+* Portal Pemerintah Daerah
+* Portal resmi instansi terkait
+* Sumber terbuka lain yang tersedia secara legal
+
+---
+
+# FITUR WAJIB
+
+## Executive Intelligence Dashboard
+
+Dashboard harus menampilkan:
+
+* Top Trending Topic
+* Top Nasional Issue
+* Top Regional Issue
+* Top Local Issue
+* Top Hashtag
+* Top Keyword
+* Top Mention
+* Top Influencer
+* Viral Content
+* Media Monitoring
+* News Feed
+* Intelligence Summary
+* Public Sentiment
+* Threat Level
+* Early Warning Alert
+* Intelligence Recommendation
+* Heatmap
+* Timeline
+* Interactive Charts
+* Intelligence Score
+* Risk Score
+
+---
+
+## Social Media Intelligence Center
+
+Menampilkan:
+
+* Trending Hashtag
+* Trending Keyword
+* Viral Video
+* Viral Post
+* Top Engagement
+* Top Influencer
+* Mention Analysis
+* Conversation Analysis
+* Community Detection
+* Network Graph
+* Social Interaction Map
+
+---
+
+## News Intelligence
+
+Menyajikan:
+
+* Breaking News
+* Strategic Issues
+* Media Sentiment
+* Media Comparison
+* News Timeline
+* Media Frequency
+* Issue Evolution
+
+---
+
+## Artificial Intelligence Analysis
+
+AI harus mampu menghasilkan:
+
+### Sentiment Analysis
+
+* Positif
+* Netral
+* Negatif
+
+beserta:
+
+* Confidence Score
+* Trend Score
+* Threat Score
+* Influence Score
+
+---
+
+### Topic Modeling
+
+Mengelompokkan isu secara otomatis menggunakan NLP.
+
+---
+
+### Event Detection
+
+Mendeteksi secara otomatis:
+
+* Demonstrasi
+* Konflik sosial
+* Tawuran
+* Kerusuhan
+* Hoaks
+* Disinformasi
+* Ujaran kebencian
+* Radikalisme
+* Kejahatan menonjol
+* Gangguan Kamtibmas
+
+---
+
+### Predictive Intelligence
+
+Menggunakan Machine Learning untuk memperkirakan:
+
+* Potensi eskalasi isu
+* Tingkat ancaman
+* Wilayah yang berpotensi mengalami peningkatan risiko
+* Prediksi perkembangan sentimen
+
+---
+
+## Early Warning System
+
+Berikan level ancaman:
+
+🟢 Hijau
+
+🟡 Kuning
+
+🟠 Oranye
+
+🔴 Merah
+
+Sertakan alasan analitis yang mendukung penentuan level ancaman.
+
+---
+
+## Geographic Intelligence
+
+Gunakan:
+
+* OpenStreetMap
+* LeafletJS
+
+Menampilkan:
+
+* Heatmap
+* Titik kejadian
+* Sebaran isu
+* Sebaran sentimen
+* Wilayah rawan
+* Timeline spasial
+
+---
+
+## Intelligence Recommendation Engine
+
+AI wajib menghasilkan rekomendasi otomatis berdasarkan hasil analisis.
+
+### Langkah Intelijen
+
+* Monitoring lanjutan
+* Pengumpulan informasi tambahan
+* Pendalaman aktor
+* Pendalaman jaringan
+* Klarifikasi informasi
+* Validasi sumber
+
+### Langkah Preventif
+
+* Counter narasi
+* Edukasi publik
+* Penguatan komunikasi publik
+* Mitigasi konflik
+* Penguatan koordinasi
+
+### Langkah Pengamanan
+
+* Peningkatan patroli
+* Pengamanan objek vital
+* Penguatan koordinasi lintas instansi
+* Penyesuaian pola pengamanan berdasarkan tingkat ancaman
+
+Rekomendasi harus berbasis data dan tidak menggantikan keputusan manusia.
+
+---
+
+# DASHBOARD DESIGN
+
+Desain harus mencerminkan Command Center Intelligence modern.
+
+Konsep:
+
+* Premium
+* Futuristik
+* Cyber Intelligence
+* Glassmorphism
+* Dark Mode
+* Military Command Center
+* National Intelligence Dashboard
+* Responsive
+* Mobile Friendly
+* Enterprise Grade
+
+Warna:
+
+* Black
+* Dark Navy
+* Electric Blue
+* Cyan
+* Emerald
+* Soft White
+
+Komponen UI:
+
+* Animated Cards
+* Live Counter
+* Intelligence Timeline
+* Alert Center
+* Notification Center
+* Live Feed
+* Interactive Maps
+* Intelligence Charts
+* Trend Graph
+* Risk Indicator
+* KPI Cards
+* Executive Summary Panel
+
+---
+
+# STACK TEKNOLOGI
+
+Frontend
+
+* HTML5
+* Tailwind CSS
+* JavaScript (Vanilla)
+* Chart.js
+* LeafletJS
+* ApexCharts
+
+Backend
+
+* Python
+* FastAPI
+* Node.js
+
+AI
+
+* TensorFlow
+* Scikit-Learn
+* Hugging Face Transformers
+* spaCy
+* NLTK
+* Sentence Transformers
+
+Database
+
+* PostgreSQL
+* Redis
+* Elasticsearch
+
+Search Engine
+
+* Elasticsearch
+
+GIS
+
+* OpenStreetMap
+* LeafletJS
+
+Deployment
+
+* Docker
+* Docker Compose
+* Nginx
+* GitHub Actions
+* Netlify (Frontend)
+* Railway / VPS (Backend)
+
+---
+
+# KEAMANAN SISTEM
+
+Implementasikan:
+
+* JWT Authentication
+* RBAC (Role-Based Access Control)
+* Multi-Factor Authentication (opsional)
+* API Rate Limiting
+* Audit Log
+* Activity Log
+* Encryption at Rest & in Transit
+* Secure HTTP Headers
+* OWASP Top 10 Mitigation
+* Backup & Disaster Recovery Plan
+
+---
+
+# OUTPUT YANG WAJIB DIHASILKAN
+
+Susun jawaban dalam beberapa fase yang berurutan dan sangat rinci:
+
+### Fase 1 — Analisis Kebutuhan
+
+* Analisis kebutuhan fungsional dan nonfungsional.
+* Identifikasi aktor, use case, dan alur bisnis.
+* Risiko, asumsi, serta batasan sistem.
+
+### Fase 2 — Arsitektur
+
+* High Level Architecture.
+* Microservices Architecture (jika diperlukan).
+* Diagram komponen.
+* Diagram alur data.
+
+### Fase 3 — Database
+
+* ERD.
+* Skema database.
+* Relasi tabel.
+* Indeks dan strategi performa.
+
+### Fase 4 — API
+
+* REST API.
+* Endpoint.
+* Request/Response.
+* Autentikasi.
+* Dokumentasi OpenAPI/Swagger.
+
+### Fase 5 — UI/UX
+
+* Wireframe.
+* Dashboard.
+* Navigasi.
+* Komponen.
+* Design System.
+
+### Fase 6 — Implementasi
+
+* Struktur folder project.
+* Source code HTML.
+* Source code Tailwind CSS.
+* Source code JavaScript.
+* Source code Python.
+* Integrasi API.
+* Integrasi AI.
+
+### Fase 7 — Artificial Intelligence
+
+* Sentiment Analysis.
+* Topic Modeling.
+* Event Detection.
+* Predictive Analytics.
+* Recommendation Engine.
+
+### Fase 8 — Deployment
+
+* Docker.
+* CI/CD.
+* Reverse Proxy.
+* Monitoring.
+* Logging.
+* Backup.
+* Skalabilitas.
+
+### Fase 9 — Enterprise Roadmap
+
+* Roadmap 6 bulan.
+* Roadmap 1 tahun.
+* Roadmap 3 tahun.
+* Strategi pengembangan menuju platform intelijen enterprise.
+
+---
+
+# ATURAN PENTING
+
+1. Jelaskan setiap keputusan desain dari perspektif analis intelijen profesional dan software architect.
+2. Gunakan data publik yang tersedia secara legal, patuhi syarat layanan (Terms of Service) setiap platform, serta hormati privasi dan regulasi yang berlaku.
+3. Untuk platform yang tidak menyediakan API publik atau membatasi akses, gunakan pendekatan yang sah seperti RSS, API resmi, atau integrasi yang diizinkan.
+4. Setiap modul harus dapat dikembangkan secara independen (modular architecture).
+5. Prioritaskan skalabilitas, keamanan, maintainability, dan kemudahan integrasi.
+6. Tulis seluruh kode dengan standar production-ready, lengkap dengan komentar, dokumentasi, dan praktik terbaik.
+7. Kerjakan secara bertahap. Setelah menyelesaikan satu fase, lanjutkan otomatis ke fase berikutnya hingga seluruh sistem selesai.
