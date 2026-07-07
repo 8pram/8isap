@@ -52,6 +52,7 @@ RSS_SOURCES = [
     ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(site:aktual.com+OR+site:idntimes.com+OR+site:antvklik.com+OR+site:elshinta.com+OR+site:inilah.com+OR+site:neraca.co.id+OR+site:koran-jakarta.com+OR+site:tribunnews.com+OR+site:mediaindonesia.com+OR+site:wartaekonomi.co.id+OR+site:detik.com+OR+site:sindonews.com)+when:1d&hl=id&gl=ID&ceid=ID:id'),
     ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(site:harianterbit.com+OR+site:viva.co.id+OR+site:idxchannel.com+OR+site:suarakarya.id+OR+site:poskota.co+OR+site:suara.com+OR+site:akurat.co+OR+site:sinarharapan.id+OR+site:jakarta.suaramerdeka.com+OR+site:jawapos.com+OR+site:genpi.co)+when:1d&hl=id&gl=ID&ceid=ID:id'),
     ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(site:cnbcindonesia.com+OR+site:swa.co.id+OR+site:wartakota.tribunnews.com+OR+site:balipost.com+OR+site:liputan6.com+OR+site:okezone.com+OR+site:investor.id+OR+site:antaranews.com+OR+site:tirto.id+OR+site:medcom.id+OR+site:galapos.id)+when:1d&hl=id&gl=ID&ceid=ID:id'),
+    ('Radar Darurat', 'https://news.google.com/rss/search?q=(narkoba+OR+teroris+OR+pembunuhan+OR+korupsi+OR+demo+OR+unjuk+rasa+OR+bentrok+OR+begal)+when:1d&hl=id&gl=ID&ceid=ID:id'),
     ('Global', 'https://news.google.com/rss/search?q=(internasional+OR+dunia)+AND+(site:inews.id+OR+site:tvrinews.com+OR+site:kompas.com+OR+site:detik.com+OR+site:tribunnews.com+OR+site:cnbcindonesia.com+OR+site:cnnindonesia.com+OR+site:antaranews.com)+when:1d&hl=id&gl=ID&ceid=ID:id')
 ]
 

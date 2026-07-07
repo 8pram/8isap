@@ -14,6 +14,7 @@ const RSS_SOURCES = {
     'Kab. Pasuruan': 'https://news.google.com/rss/search?q=pasuruan+OR+bangil+OR+pandaan+when:1d&hl=id&gl=ID&ceid=ID:id',
     'Jawa Timur': 'https://news.google.com/rss/search?q=jawa+timur+OR+jatim+when:1d&hl=id&gl=ID&ceid=ID:id',
     'Nasional': 'https://news.google.com/rss/search?q=indonesia+kriminal+OR+politik+when:1d&hl=id&gl=ID&ceid=ID:id',
+    'Radar Darurat': 'https://news.google.com/rss/search?q=(narkoba+OR+teroris+OR+pembunuhan+OR+korupsi+OR+demo+OR+unjuk+rasa+OR+bentrok+OR+begal)+when:1d&hl=id&gl=ID&ceid=ID:id',
     'Global': 'https://news.google.com/rss/search?q=internasional+OR+geopolitik+OR+perang+when:1d&hl=id&gl=ID&ceid=ID:id'
 };
 
