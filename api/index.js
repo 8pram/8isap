@@ -270,7 +270,13 @@ app.get('/api/v1/ai/recommendation', async (req, res) => {
         // Extract keywords from negative content
         if (negativeOsint && negativeOsint.length > 0) {
             let kwMap = {};
-            const stopwords = ['di','ke','dari','dan','atau','yang','untuk','dengan','ini','itu','pada','dalam','akan','telah','bisa','ada','tidak','saat','the','is','of','in'];
+            const stopwords = [
+                'di','ke','dari','dan','atau','yang','untuk','dengan','ini','itu','pada','dalam',
+                'akan','telah','bisa','ada','tidak','saat','the','is','of','in','hingga','sebagai',
+                'kepada','bagi','karena','oleh','namun','juga','lalu','serta','bahwa','lebih',
+                'menjadi','lagi','sudah','baru','hanya','tentang','setelah','secara','mereka',
+                'kita','kami','saya','anda','dia','apa','siapa','mengapa','bagaimana','mana'
+            ];
             negativeOsint.forEach(item => {
                 if (item.content) {
                     item.content.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).forEach(w => {
