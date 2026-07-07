@@ -555,6 +555,56 @@ async function fetchDashboardData(region, isSilent = false) {
         console.warn("API Backend tidak aktif. Mengaktifkan Mode RSS Fallback...");
         fetchFallbackRSS(region, container, osintContainer);
     }
+}
+
+// --- SOCIAL DATA FETCHER ---
+async function fetchSocialData() {
+    try {
+        const [kwdRes, critRes] = await Promise.all([
+            fetch(`${API_BASE}/api/v1/analytics/keywords`),
+            fetch(`${API_BASE}/api/v1/analytics/critical`)
+        ]);
+
+        const keywords = await kwdRes.json();
+        const criticals = await critRes.json();
+
+        // Render Keywords
+        const kwdList = document.getElementById('analytics-keywords-list');
+        const dashKwdList = document.getElementById('trending-keywords-dashboard');
+
+        if (keywords.length > 0) {
+            const kwdHTML = keywords.map(k => `
+                <div class="p-2 rounded bg-dark-900 border border-gray-700 flex justify-between items-center hover:border-gray-500 transition-colors">
+                    <span class="text-xs font-bold text-accent-emerald">#${k.word.toUpperCase()}</span>
+                    <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} mentions</span>
+                </div>
+            `).join('');
+
+            if (kwdList) kwdList.innerHTML = kwdHTML;
+
+            if (dashKwdList) {
+                dashKwdList.innerHTML = keywords.slice(0, 5).map((k, i) => {
+                    const isUp = Math.random() > 0.3;
+                    const color = isUp ? 'text-accent-emerald' : 'text-accent-amber';
+                    const icon = isUp ? 'ph-trend-up' : 'ph-trend-down';
+                    return `
+                    <div class="p-2 rounded bg-dark-900 border border-gray-700/50 flex justify-between items-center hover:border-gray-500 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] font-mono text-gray-500 w-4">${i + 1}.</span>
+                            <span class="text-xs font-bold text-white">#${k.word.toUpperCase()}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} vol</span>
+                            <i class="ph-fill ${icon} ${color} text-sm"></i>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        } else {
+            if (kwdList) kwdList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data kata kunci.</p>';
+            if (dashKwdList) dashKwdList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data trending.</p>';
+        }
+
         // Generate Sources based on region
         const regionSelect = document.getElementById('region-select');
         const region = regionSelect ? regionSelect.value : 'Nasional';
