@@ -145,6 +145,14 @@
         .leaflet-control-attribution {
             filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
         }
+        @media (max-width: 767px) {
+            #top-issues-container > div:nth-child(n+6) {
+                display: none !important;
+            }
+            #osint-feed > div:nth-child(n+6) {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -164,19 +172,20 @@
     <!-- Header -->
     <header class="cyber-header px-3 py-2 md:px-6 md:py-3 flex justify-between items-center shrink-0">
         <div class="flex items-center gap-4">
-            <div class="w-10 h-10 bg-white/10 rounded-lg border border-accent-blue/50 flex items-center justify-center overflow-hidden shrink-0">
+            <div
+                class="w-10 h-10 bg-white/10 rounded-lg border border-accent-blue/50 flex items-center justify-center overflow-hidden shrink-0">
                 <img src="assets/logo.png" alt="ISAP Logo" class="w-full h-full object-cover">
             </div>
             <div>
-                <h1 class="text-lg md:text-xl font-bold tracking-wider text-white">ISAP <span
+                <h1 class="hidden md:block text-xl font-bold tracking-wider text-white">ISAP <span
                         class="text-accent-blue font-light">COMMAND CENTER</span></h1>
-                <p class="text-[8px] md:text-[10px] text-gray-400 font-mono tracking-widest leading-none">INTELLIGENCE SITUATIONAL AWARENESS PLATFORM</p>
+                <p class="text-[10px] text-gray-400 font-mono tracking-widest leading-none md:mt-1 font-bold md:font-normal">INTELLIGENCE SITUATIONAL AWARENESS PLATFORM</p>
             </div>
         </div>
         <div class="flex items-center gap-6">
             <div class="text-right">
-                <p class="text-sm font-mono font-bold text-white" id="live-time">00:00:00 WIB</p>
-                <p class="text-xs text-gray-400 font-mono" id="live-date">1 Jan 2026</p>
+                <p class="text-[10px] md:text-sm font-mono font-bold text-white whitespace-nowrap" id="live-time">00:00:00 WIB</p>
+                <p class="text-[9px] md:text-xs text-gray-400 font-mono whitespace-nowrap" id="live-date">1 Jan 2026</p>
             </div>
             <div class="h-8 w-px bg-gray-700"></div>
             <div class="flex items-center gap-3">
@@ -196,7 +205,8 @@
     <main class="flex-1 flex flex-col-reverse md:flex-row overflow-hidden p-2 md:p-4 gap-2 md:gap-4 min-h-0">
         <!-- Sidebar Navigation -->
         <aside class="w-full md:w-16 flex md:flex-col shrink-0 z-50 pb-2 md:pb-0">
-            <nav class="cyber-card flex-1 p-2 md:py-4 px-4 flex flex-row md:flex-col items-center justify-between md:justify-start md:gap-6 w-full overflow-x-auto" id="main-nav">
+            <nav class="cyber-card flex-1 p-2 md:py-4 px-4 flex flex-row md:flex-col items-center justify-between md:justify-start md:gap-6 w-full overflow-x-auto"
+                id="main-nav">
                 <button
                     class="nav-btn w-10 h-10 rounded-lg bg-accent-blue/20 text-accent-blue flex items-center justify-center border border-accent-blue/50 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer"
                     data-target="view-executive" title="Executive Dashboard">
@@ -233,7 +243,7 @@
                 class="view-section grid flex-1 grid-cols-1 md:grid-cols-4 gap-4 overflow-y-auto md:overflow-hidden w-full min-h-0 pb-10 md:pb-0">
 
                 <!-- Left Column: Metrics & Isu -->
-                <div class="md:col-span-1 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
+                <div class="md:col-span-1 flex flex-col gap-4 md:overflow-hidden md:h-full md:min-h-0">
                     <!-- Status & Overall -->
                     <div class="cyber-card p-4 shrink-0">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
@@ -245,7 +255,8 @@
                             </div>
                             <div id="status-icon-wrapper"
                                 class="w-12 h-12 rounded-full border-4 border-accent-emerald border-t-transparent animate-spin flex items-center justify-center relative">
-                                <i class="ph-fill ph-shield-check text-accent-emerald text-lg absolute" id="status-icon"></i>
+                                <i class="ph-fill ph-shield-check text-accent-emerald text-lg absolute"
+                                    id="status-icon"></i>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -261,7 +272,7 @@
                     </div>
 
                     <!-- Top Isu List -->
-                    <div class="cyber-card p-4 flex flex-col overflow-hidden h-[400px] md:h-auto md:min-h-0 md:flex-1">
+                    <div class="cyber-card p-4 flex flex-col overflow-hidden h-auto md:min-h-0 md:flex-1">
                         <div class="flex justify-between items-center mb-4 shrink-0">
                             <h2 class="text-[11px] text-gray-400 font-bold flex items-center gap-2 tracking-wider"><i
                                     class="ph-fill ph-fire text-accent-red"></i> TOP ISU STRATEGIS</h2>
@@ -280,13 +291,15 @@
                 </div>
 
                 <!-- Center Column: Map & Timeline -->
-                <div class="md:col-span-2 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
+                <div class="md:col-span-2 flex flex-col gap-4 md:overflow-hidden md:h-full md:min-h-0">
                     <!-- Live Feed / Recommendation (Moved to Center) -->
-                    <div class="cyber-card p-4 flex flex-col overflow-hidden h-[500px] md:h-auto md:min-h-0 md:flex-1">
+                    <div class="cyber-card p-4 flex flex-col overflow-hidden h-[400px] md:h-auto md:min-h-0 md:flex-1">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
                                 class="ph-fill ph-robot text-accent-emerald"></i> AI RECOMMENDATION</h2>
-                        <div class="bg-accent-emerald/5 border border-accent-emerald/20 p-3 rounded mb-4 shrink-0" id="ai-recommendation-box">
-                            <p class="text-[10px] text-accent-emerald font-bold mb-1 tracking-wider">TINDAKAN PREVENTIF:</p>
+                        <div class="bg-accent-emerald/5 border border-accent-emerald/20 p-3 rounded mb-4 shrink-0"
+                            id="ai-recommendation-box">
+                            <p class="text-[10px] text-accent-emerald font-bold mb-1 tracking-wider">TINDAKAN PREVENTIF:
+                            </p>
                             <p class="text-xs text-gray-300 leading-relaxed" id="ai-recommendation-text">
                                 <i class="ph ph-spinner animate-spin"></i> Memuat rekomendasi AI...
                             </p>
@@ -301,7 +314,7 @@
                 </div>
 
                 <!-- Right Column: AI Sentiment & Live Feed -->
-                <div class="md:col-span-1 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
+                <div class="md:col-span-1 flex flex-col gap-4 md:overflow-hidden md:h-full md:min-h-0">
                     <!-- AI Sentiment -->
                     <div class="cyber-card p-4 shrink-0">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
@@ -311,36 +324,42 @@
                             <div
                                 class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
                                 <span class="text-2xl font-bold text-white" id="sentiment-score">-%</span>
-                                <span class="text-[10px] text-gray-400 tracking-widest uppercase" id="sentiment-label">Memuat...</span>
+                                <span class="text-[10px] text-gray-400 tracking-widest uppercase"
+                                    id="sentiment-label">Memuat...</span>
                             </div>
                         </div>
                         <div class="mt-4 space-y-3 text-[10px] font-mono" id="threat-bars-container">
                             <div class="flex justify-between items-center"><span
                                     class="text-gray-400 w-16">KAMTIBMAS</span>
                                 <div class="flex-1 mx-2 bg-dark-900 rounded-full h-1.5">
-                                    <div class="bg-accent-red h-1.5 rounded-full transition-all" style="width: 0%" id="bar-provokasi"></div>
+                                    <div class="bg-accent-red h-1.5 rounded-full transition-all" style="width: 0%"
+                                        id="bar-provokasi"></div>
                                 </div><span class="text-accent-red w-8 text-right" id="bar-provokasi-pct">0%</span>
                             </div>
                             <div class="flex justify-between items-center"><span class="text-gray-400 w-16">HOAKS</span>
                                 <div class="flex-1 mx-2 bg-dark-900 rounded-full h-1.5">
-                                    <div class="bg-accent-amber h-1.5 rounded-full transition-all" style="width: 0%" id="bar-hoaks"></div>
+                                    <div class="bg-accent-amber h-1.5 rounded-full transition-all" style="width: 0%"
+                                        id="bar-hoaks"></div>
                                 </div><span class="text-accent-amber w-8 text-right" id="bar-hoaks-pct">0%</span>
                             </div>
-                            <div class="flex justify-between items-center"><span class="text-gray-400 w-16">KRIMINAL</span>
+                            <div class="flex justify-between items-center"><span
+                                    class="text-gray-400 w-16">KRIMINAL</span>
                                 <div class="flex-1 mx-2 bg-dark-900 rounded-full h-1.5">
-                                    <div class="bg-accent-blue h-1.5 rounded-full transition-all" style="width: 0%" id="bar-kriminal"></div>
+                                    <div class="bg-accent-blue h-1.5 rounded-full transition-all" style="width: 0%"
+                                        id="bar-kriminal"></div>
                                 </div><span class="text-accent-blue w-8 text-right" id="bar-kriminal-pct">0%</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Trending Topics (Moved to Right) -->
-                    <div class="cyber-card p-4 flex flex-col h-[300px] md:h-auto md:flex-1">
+                    <div class="cyber-card p-4 flex flex-col h-auto md:flex-1">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
                                 class="ph-fill ph-trend-up text-accent-emerald"></i> TRENDING TOPIK & KATA KUNCI</h2>
                         <div class="flex-1 overflow-y-auto pr-1 space-y-2" id="trending-keywords-dashboard">
                             <!-- JS Injected Trending -->
-                            <div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-emerald text-xl"></i></div>
+                            <div class="text-center py-4"><i
+                                    class="ph ph-spinner animate-spin text-accent-emerald text-xl"></i></div>
                         </div>
                     </div>
                 </div>
@@ -456,7 +475,10 @@
                             </h3>
                             <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="news-list">
                                 <!-- Populated by JS from API -->
-                                <div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-blue text-2xl"></i><p class="text-[10px] text-gray-500 mt-2 font-mono">Memuat berita...</p></div>
+                                <div class="text-center py-4"><i
+                                        class="ph ph-spinner animate-spin text-accent-blue text-2xl"></i>
+                                    <p class="text-[10px] text-gray-500 mt-2 font-mono">Memuat berita...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -480,7 +502,8 @@
                             </h3>
                             <div class="flex-1 overflow-y-auto space-y-2 text-[10px] font-mono" id="media-active-stats">
                                 <!-- Populated by JS from API -->
-                                <div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-amber text-xl"></i></div>
+                                <div class="text-center py-4"><i
+                                        class="ph ph-spinner animate-spin text-accent-amber text-xl"></i></div>
                             </div>
                         </div>
                     </div>
@@ -504,7 +527,10 @@
                                 class="ph-fill ph-bell-ringing text-accent-amber"></i> ACTIVE THREAT ALERTS</h3>
                         <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="ews-alerts-container">
                             <!-- Populated by JS from API -->
-                            <div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-red text-2xl"></i><p class="text-[10px] text-gray-500 mt-2 font-mono">Memuat ancaman aktif...</p></div>
+                            <div class="text-center py-4"><i
+                                    class="ph ph-spinner animate-spin text-accent-red text-2xl"></i>
+                                <p class="text-[10px] text-gray-500 mt-2 font-mono">Memuat ancaman aktif...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -533,4 +559,5 @@
     <!-- Master Application Logic with Cache Buster -->
     <script src="js/main.js?v=2.0"></script>
 </body>
+
 </html>
