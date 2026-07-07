@@ -4,18 +4,17 @@ const Sentiment = require('sentiment');
 const sentimentAnalyzer = new Sentiment();
 
 const THREAT_KEYWORDS = {
-    red: ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran'],
-    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
-    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu'],
-    geopolitik: ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global']
+    red: ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran', 'anarkis', 'unras'],
+    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas', 'bencana', 'gempa', 'banjir', 'longsor', 'sindikat', 'perdagangan orang', 'penyelundupan', 'scam'],
+    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu', 'kesehatan', 'penyakit', 'hewan ternak', 'harta benda', 'perbankan', 'budaya', 'kegiatan masyarakat', 'ormas', 'keagamaan', 'aparat', 'tni', 'polisi', 'sidang', 'pengadilan'],
+    geopolitik: ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global', 'gencatan senjata']
 };
 
 const RSS_SOURCES = {
-    'Kab. Pasuruan': 'https://news.google.com/rss/search?q=pasuruan+OR+bangil+OR+pandaan+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Jawa Timur': 'https://news.google.com/rss/search?q=jawa+timur+OR+jatim+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Nasional': 'https://news.google.com/rss/search?q=indonesia+kriminal+OR+politik+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Radar Darurat': 'https://news.google.com/rss/search?q=(narkoba+OR+teroris+OR+pembunuhan+OR+korupsi+OR+demo+OR+unjuk+rasa+OR+bentrok+OR+begal)+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Global': 'https://news.google.com/rss/search?q=internasional+OR+geopolitik+OR+perang+when:1d&hl=id&gl=ID&ceid=ID:id'
+    'Kab. Pasuruan': 'https://news.google.com/rss/search?q=(pasuruan+OR+bangil+OR+pandaan)&hl=id&gl=ID&ceid=ID:id',
+    'Jawa Timur': 'https://news.google.com/rss/search?q=(jawa+timur+OR+jatim)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)&hl=id&gl=ID&ceid=ID:id',
+    'Nasional': 'https://news.google.com/rss/search?q=(indonesia)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)&hl=id&gl=ID&ceid=ID:id',
+    'Global': 'https://news.google.com/rss/search?q=(internasional+OR+dunia)+AND+(narkoba+OR+perang+OR+scam+OR+penyelundupan+OR+geopolitik+OR+kriminal)&hl=id&gl=ID&ceid=ID:id'
 };
 
 function analyzeText(text) {

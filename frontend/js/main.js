@@ -196,10 +196,10 @@ function initCharts() {
 // --- 4. Real-Time Data Engine ---
 
 const THREAT_KEYWORDS = {
-    red: ['demo', 'unjuk rasa', 'bentrok', 'tawuran', 'ricuh', 'carok', 'kerusuhan', 'kebakaran'],
-    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
-    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu'],
-    geopolitik: ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global']
+    red: ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran', 'anarkis', 'unras'],
+    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas', 'bencana', 'gempa', 'banjir', 'longsor', 'sindikat', 'perdagangan orang', 'penyelundupan', 'scam'],
+    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu', 'kesehatan', 'penyakit', 'hewan ternak', 'harta benda', 'perbankan', 'budaya', 'kegiatan masyarakat', 'ormas', 'keagamaan', 'aparat', 'tni', 'polisi', 'sidang', 'pengadilan'],
+    geopolitik: ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global', 'gencatan senjata']
 };
 
 function analyzeThreat(text) {
@@ -250,11 +250,10 @@ function analyzeThreat(text) {
 }
 
 const RSS_FEEDS = {
-    'Kab. Pasuruan': 'https://news.google.com/rss/search?q=pasuruan+OR+bangil+OR+pandaan+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Jawa Timur': 'https://news.google.com/rss/search?q=jawa+timur+OR+jatim+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Nasional': 'https://news.google.com/rss/search?q=indonesia+kriminal+OR+politik+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Radar Darurat': 'https://news.google.com/rss/search?q=(narkoba+OR+teroris+OR+pembunuhan+OR+korupsi+OR+demo+OR+unjuk+rasa+OR+bentrok+OR+begal)+when:1d&hl=id&gl=ID&ceid=ID:id',
-    'Global': 'https://news.google.com/rss/search?q=internasional+when:1d&hl=id&gl=ID&ceid=ID:id'
+    'Kab. Pasuruan': 'https://news.google.com/rss/search?q=(pasuruan+OR+bangil+OR+pandaan)&hl=id&gl=ID&ceid=ID:id',
+    'Jawa Timur': 'https://news.google.com/rss/search?q=(jawa+timur+OR+jatim)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)&hl=id&gl=ID&ceid=ID:id',
+    'Nasional': 'https://news.google.com/rss/search?q=(indonesia)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)&hl=id&gl=ID&ceid=ID:id',
+    'Global': 'https://news.google.com/rss/search?q=(internasional+OR+dunia)+AND+(narkoba+OR+perang+OR+scam+OR+penyelundupan+OR+geopolitik+OR+kriminal)&hl=id&gl=ID&ceid=ID:id'
 };
 
 let pollingInterval = null;
@@ -703,25 +702,22 @@ async function fetchFallbackRSS(region, container, osintContainer) {
             const iconColor = analysis.threatLevel === 'red' ? 'text-accent-red' : analysis.threatLevel === 'amber' ? 'text-accent-amber' : 'text-accent-blue';
             const bgIcon = analysis.threatLevel === 'red' ? 'bg-accent-red/10' : analysis.threatLevel === 'amber' ? 'bg-accent-amber/10' : 'bg-accent-blue/10';
 
-            // Only show red/amber or Geopolitik/Kebijakan in Top Issues
-            if (['red', 'amber'].includes(analysis.threatLevel) || ['Geopolitik', 'Kebijakan/Program'].includes(analysis.category)) {
-                htmlTop += `
-                <div class="flex items-center justify-between p-2 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-500 transition-colors cursor-pointer relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-1.5 h-full ${analysis.threatLevel === 'red' ? 'bg-accent-red' : 'bg-transparent'}"></div>
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded ${bgIcon} flex items-center justify-center shrink-0">
-                            <i class="ph-fill ph-hash ${iconColor}"></i>
-                        </div>
-                        <div>
-                            <p class="text-[11px] font-bold text-white leading-tight line-clamp-2">${title}</p>
-                            <p class="text-[9px] text-gray-500 font-mono mt-0.5">${analysis.category} <span class="text-accent-cyan text-[8px] border border-accent-cyan/30 px-1 rounded ml-1">RSS</span></p>
-                        </div>
+            htmlTop += `
+            <div class="flex items-center justify-between p-2 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-500 transition-colors cursor-pointer relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-1.5 h-full ${analysis.threatLevel === 'red' ? 'bg-accent-red' : 'bg-transparent'}"></div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded ${bgIcon} flex items-center justify-center shrink-0">
+                        <i class="ph-fill ph-hash ${iconColor}"></i>
                     </div>
-                    <div class="text-right shrink-0">
-                        <p class="text-[10px] ${isUp ? 'text-accent-red' : 'text-accent-emerald'} font-mono">${trendStr}</p>
+                    <div>
+                        <p class="text-[11px] font-bold text-white leading-tight line-clamp-2">${title}</p>
+                        <p class="text-[9px] text-gray-500 font-mono mt-0.5">${analysis.category} <span class="text-accent-cyan text-[8px] border border-accent-cyan/30 px-1 rounded ml-1">RSS</span></p>
                     </div>
-                </div>`;
-            }
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-[10px] ${isUp ? 'text-accent-red' : 'text-accent-emerald'} font-mono">${trendStr}</p>
+                </div>
+            </div>`;
         });
 
         items.slice(0, 15).forEach(item => {
