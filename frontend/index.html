@@ -194,10 +194,10 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 flex overflow-hidden p-4 gap-4 min-h-0">
+    <main class="flex-1 flex flex-col-reverse md:flex-row overflow-hidden p-2 md:p-4 gap-2 md:gap-4 min-h-0">
         <!-- Sidebar Navigation -->
-        <aside class="w-16 flex flex-col gap-4 shrink-0 hidden md:flex">
-            <nav class="cyber-card flex-1 py-4 flex flex-col items-center gap-6" id="main-nav">
+        <aside class="w-full md:w-16 flex md:flex-col shrink-0 z-50">
+            <nav class="cyber-card flex-1 p-2 md:py-4 px-4 flex flex-row md:flex-col items-center justify-between md:justify-start md:gap-6 w-full overflow-x-auto" id="main-nav">
                 <button
                     class="nav-btn w-10 h-10 rounded-lg bg-accent-blue/20 text-accent-blue flex items-center justify-center border border-accent-blue/50 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer"
                     data-target="view-executive" title="Executive Dashboard">
@@ -231,10 +231,10 @@
 
             <!-- 1. EXECUTIVE DASHBOARD (Current Layout) -->
             <div id="view-executive"
-                class="view-section grid flex-1 grid-cols-1 md:grid-cols-4 gap-4 overflow-hidden w-full min-h-0">
+                class="view-section grid flex-1 grid-cols-1 md:grid-cols-4 gap-4 overflow-y-auto md:overflow-hidden w-full min-h-0 pb-10 md:pb-0">
 
                 <!-- Left Column: Metrics & Isu -->
-                <div class="md:col-span-1 flex flex-col gap-4 overflow-hidden h-full min-h-0">
+                <div class="md:col-span-1 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
                     <!-- Status & Overall -->
                     <div class="cyber-card p-4 shrink-0">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
@@ -262,7 +262,7 @@
                     </div>
 
                     <!-- Top Isu List -->
-                    <div class="cyber-card p-4 flex-1 flex flex-col overflow-hidden">
+                    <div class="cyber-card p-4 flex flex-col overflow-hidden min-h-[300px] md:min-h-0 md:flex-1">
                         <div class="flex justify-between items-center mb-4 shrink-0">
                             <h2 class="text-[11px] text-gray-400 font-bold flex items-center gap-2 tracking-wider"><i
                                     class="ph-fill ph-fire text-accent-red"></i> TOP ISU STRATEGIS</h2>
@@ -282,9 +282,9 @@
                 </div>
 
                 <!-- Center Column: Map & Timeline -->
-                <div class="md:col-span-2 flex flex-col gap-4 overflow-hidden h-full min-h-0">
+                <div class="md:col-span-2 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
                     <!-- Map Container -->
-                    <div class="cyber-card p-1.5 flex-1 relative flex flex-col min-h-0">
+                    <div class="cyber-card p-1.5 relative flex flex-col min-h-[400px] md:min-h-0 md:flex-1">
                         <div class="absolute top-4 left-4 z-[400] pointer-events-none">
                             <div
                                 class="bg-dark-900/90 backdrop-blur border border-gray-700 p-2 rounded flex items-center gap-3">
@@ -329,7 +329,7 @@
                 </div>
 
                 <!-- Right Column: AI Sentiment & Live Feed -->
-                <div class="md:col-span-1 flex flex-col gap-4 overflow-hidden h-full min-h-0">
+                <div class="md:col-span-1 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
                     <!-- AI Sentiment -->
                     <div class="cyber-card p-4 shrink-0">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
@@ -363,7 +363,7 @@
                     </div>
 
                     <!-- Live Feed / Recommendation -->
-                    <div class="cyber-card p-4 flex-1 flex flex-col overflow-hidden min-h-0">
+                    <div class="cyber-card p-4 flex flex-col overflow-hidden min-h-[400px] md:min-h-0 md:flex-1">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
                                 class="ph-fill ph-robot text-accent-emerald"></i> AI RECOMMENDATION</h2>
                         <div class="bg-accent-emerald/5 border border-accent-emerald/20 p-3 rounded mb-4 shrink-0" id="ai-recommendation-box">
