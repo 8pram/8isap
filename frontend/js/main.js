@@ -62,14 +62,17 @@ let threatMapMarkers = [];
 function initMap() {
     const pasuruanCoords = [-7.6453, 112.8224];
 
-    mainMap = L.map('map', {
-        zoomControl: false,
-        attributionControl: false
-    }).setView(pasuruanCoords, 10);
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+        mainMap = L.map('map', {
+            zoomControl: false,
+            attributionControl: false
+        }).setView(pasuruanCoords, 10);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-    }).addTo(mainMap);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+        }).addTo(mainMap);
+    }
 
     // Init Threat Map (Large)
     const threatMapEl = document.getElementById('threat-map-large');
@@ -119,8 +122,10 @@ async function fetchMapMarkers() {
         const markers = await res.json();
 
         // Clear existing markers
-        mainMapMarkers.forEach(m => mainMap.removeLayer(m));
-        mainMapMarkers = [];
+        if (mainMap) {
+            mainMapMarkers.forEach(m => mainMap.removeLayer(m));
+            mainMapMarkers = [];
+        }
         if (threatMap) {
             threatMapMarkers.forEach(m => threatMap.removeLayer(m));
             threatMapMarkers = [];
@@ -132,8 +137,10 @@ async function fetchMapMarkers() {
                     const icon = createIcon(item.type);
                     const popup = `<b>${item.region || ''}</b><br>${item.title}<br><small>${item.category} - ${item.severity}</small>`;
 
-                    const m1 = L.marker([item.lat, item.lng], { icon }).addTo(mainMap).bindPopup(popup);
-                    mainMapMarkers.push(m1);
+                    if (mainMap) {
+                        const m1 = L.marker([item.lat, item.lng], { icon }).addTo(mainMap).bindPopup(popup);
+                        mainMapMarkers.push(m1);
+                    }
 
                     if (threatMap && (item.type === 'threat' || item.type === 'warning')) {
                         const m2 = L.marker([item.lat, item.lng], { icon }).addTo(threatMap).bindPopup(popup);
@@ -464,7 +471,7 @@ async function fetchDashboardData(region, isSilent = false) {
         const topRes = await fetch(`${API_BASE}/api/v1/incidents/top?region=${encodeURIComponent(region)}`);
         if (!topRes.ok) throw new Error("Server response not ok");
         const topIssues = await topRes.json();
-        
+
         if (!topIssues || topIssues.length === 0) {
             throw new Error("No data in DB, trigger RSS fallback");
         }
@@ -608,7 +615,7 @@ async function fetchSocialData() {
         // Generate Sources based on region
         const regionSelect = document.getElementById('region-select');
         const region = regionSelect ? regionSelect.value : 'Nasional';
-        
+
         let mediaSources = [];
         if (region === 'Kab. Pasuruan') {
             mediaSources = ['wartabromo.com', 'radarjatim.id', 'pasuruan.times.co.id', 'pojokkiripasuruannews.com', 'pantura7.com'];
@@ -628,7 +635,7 @@ async function fetchSocialData() {
                 const count = baseVol;
                 baseVol = Math.max(10, baseVol - Math.floor(Math.random() * 20) - 5);
                 const pct = Math.min(100, (count / 150) * 100);
-                
+
                 srcHTML += `
                 <div class="mb-3">
                     <div class="flex justify-between text-[11px] font-bold text-white mb-1">
@@ -697,7 +704,7 @@ async function fetchNewsData() {
         } else if (newsList) {
             newsList.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Belum ada data berita.</p>';
         }
-    } catch (e) {}
+    } catch (e) { }
 }
 
 // --- FALLBACK RSS (server-side proxy, no CORS issues) ---
