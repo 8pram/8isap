@@ -197,8 +197,9 @@ function initCharts() {
 
 const THREAT_KEYWORDS = {
     red: ['demo', 'unjuk rasa', 'bentrok', 'tawuran', 'ricuh', 'carok', 'kerusuhan', 'kebakaran'],
-    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
-    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan']
+    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
+    strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu'],
+    geopolitik: ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global']
 };
 
 function analyzeThreat(text) {
@@ -236,8 +237,13 @@ function analyzeThreat(text) {
         }
     }
 
-    if (threatLevel === 'blue' && ['perang', 'geopolitik'].some(w => lower.includes(w))) {
-        category = 'Geopolitik';
+    if (threatLevel === 'blue') {
+        for (const kw of THREAT_KEYWORDS.geopolitik) {
+            if (lower.includes(kw)) {
+                category = 'Geopolitik';
+                break;
+            }
+        }
     }
 
     return { threatLevel, category };

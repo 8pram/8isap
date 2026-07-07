@@ -5,7 +5,7 @@ const sentimentAnalyzer = new Sentiment();
 
 const THREAT_KEYWORDS = {
     red: ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran'],
-    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
+    amber: ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas'],
     strategic: ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu'],
     geopolitik: ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global']
 };
