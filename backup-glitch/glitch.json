@@ -1,4 +1,0 @@
-{
-  "start": "cd backend-node && npm install && npm start",
-  "install": "echo 'Instalasi akan dilakukan di script start'"
-}

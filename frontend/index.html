@@ -148,7 +148,7 @@
     </style>
 </head>
 
-<body class="h-screen w-screen overflow-hidden flex flex-col">
+<body class="h-[100dvh] w-screen overflow-hidden flex flex-col">
 
     <!-- Emergency Ticker -->
     <div class="ticker-wrap text-[10px] h-6 font-mono text-accent-red flex items-center px-4 shrink-0 overflow-hidden">
@@ -162,16 +162,15 @@
     </div>
 
     <!-- Header -->
-    <header class="cyber-header px-6 py-3 flex justify-between items-center shrink-0">
+    <header class="cyber-header px-3 py-2 md:px-6 md:py-3 flex justify-between items-center shrink-0">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 bg-white/10 rounded-lg border border-accent-blue/50 flex items-center justify-center overflow-hidden shrink-0">
                 <img src="assets/logo.png" alt="ISAP Logo" class="w-full h-full object-cover">
             </div>
             <div>
-                <h1 class="text-xl font-bold tracking-wider text-white">ISAP <span
+                <h1 class="text-lg md:text-xl font-bold tracking-wider text-white">ISAP <span
                         class="text-accent-blue font-light">COMMAND CENTER</span></h1>
-                <p class="text-[10px] text-gray-400 font-mono tracking-widest">INTELLIGENCE SITUATIONAL AWARENESS
-                    PLATFORM</p>
+                <p class="text-[8px] md:text-[10px] text-gray-400 font-mono tracking-widest leading-none">INTELLIGENCE SITUATIONAL AWARENESS PLATFORM</p>
             </div>
         </div>
         <div class="flex items-center gap-6">
@@ -196,7 +195,7 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col-reverse md:flex-row overflow-hidden p-2 md:p-4 gap-2 md:gap-4 min-h-0">
         <!-- Sidebar Navigation -->
-        <aside class="w-full md:w-16 flex md:flex-col shrink-0 z-50">
+        <aside class="w-full md:w-16 flex md:flex-col shrink-0 z-50 pb-2 md:pb-0">
             <nav class="cyber-card flex-1 p-2 md:py-4 px-4 flex flex-row md:flex-col items-center justify-between md:justify-start md:gap-6 w-full overflow-x-auto" id="main-nav">
                 <button
                     class="nav-btn w-10 h-10 rounded-lg bg-accent-blue/20 text-accent-blue flex items-center justify-center border border-accent-blue/50 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] cursor-pointer"
@@ -262,7 +261,7 @@
                     </div>
 
                     <!-- Top Isu List -->
-                    <div class="cyber-card p-4 flex flex-col overflow-hidden min-h-[300px] md:min-h-0 md:flex-1">
+                    <div class="cyber-card p-4 flex flex-col overflow-hidden h-[400px] md:h-auto md:min-h-0 md:flex-1">
                         <div class="flex justify-between items-center mb-4 shrink-0">
                             <h2 class="text-[11px] text-gray-400 font-bold flex items-center gap-2 tracking-wider"><i
                                     class="ph-fill ph-fire text-accent-red"></i> TOP ISU STRATEGIS</h2>
@@ -283,7 +282,7 @@
                 <!-- Center Column: Map & Timeline -->
                 <div class="md:col-span-2 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
                     <!-- Live Feed / Recommendation (Moved to Center) -->
-                    <div class="cyber-card p-4 flex flex-col overflow-hidden min-h-[400px] md:min-h-0 md:flex-1">
+                    <div class="cyber-card p-4 flex flex-col overflow-hidden h-[500px] md:h-auto md:min-h-0 md:flex-1">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
                                 class="ph-fill ph-robot text-accent-emerald"></i> AI RECOMMENDATION</h2>
                         <div class="bg-accent-emerald/5 border border-accent-emerald/20 p-3 rounded mb-4 shrink-0" id="ai-recommendation-box">
@@ -336,7 +335,7 @@
                     </div>
 
                     <!-- Trending Topics (Moved to Right) -->
-                    <div class="cyber-card p-4 flex-1 flex flex-col min-h-[250px]">
+                    <div class="cyber-card p-4 flex flex-col h-[300px] md:h-auto md:flex-1">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
                                 class="ph-fill ph-trend-up text-accent-emerald"></i> TRENDING TOPIK & KATA KUNCI</h2>
                         <div class="flex-1 overflow-y-auto pr-1 space-y-2" id="trending-keywords-dashboard">
