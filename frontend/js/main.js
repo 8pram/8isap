@@ -86,6 +86,38 @@ function initMap() {
             maxZoom: 19,
         }).addTo(threatMap);
     }
+
+    // Load GeoJSON Boundaries
+    fetch('/data/35.14_kecamatan.geojson')
+        .then(res => res.json())
+        .then(data => {
+            const geoJsonStyle = {
+                color: "#10B981", // Emerald accent
+                weight: 1.5,
+                opacity: 0.6,
+                fillColor: "#10B981",
+                fillOpacity: 0.05
+            };
+
+            if (mainMap) {
+                L.geoJSON(data, { style: geoJsonStyle }).addTo(mainMap);
+            }
+            if (threatMap) {
+                L.geoJSON(data, { 
+                    style: geoJsonStyle,
+                    onEachFeature: function(feature, layer) {
+                        if (feature.properties && feature.properties.KECAMATAN) {
+                            layer.bindTooltip(feature.properties.KECAMATAN, {
+                                permanent: false,
+                                direction: "center",
+                                className: "bg-dark-900 border border-accent-emerald text-[9px] font-mono text-accent-emerald bg-opacity-80"
+                            });
+                        }
+                    }
+                }).addTo(threatMap);
+            }
+        })
+        .catch(err => console.warn("Failed to load GeoJSON map boundary:", err));
 }
 
 function createIcon(type) {
@@ -472,10 +504,6 @@ async function fetchDashboardData(region, isSilent = false) {
         if (!topRes.ok) throw new Error("Server response not ok");
         const topIssues = await topRes.json();
 
-        if (!topIssues || topIssues.length === 0) {
-            throw new Error("No data in DB, trigger RSS fallback");
-        }
-
         const sumRes = await fetch(`${API_BASE}/api/v1/dashboard/summary`);
         const summary = await sumRes.json();
 
@@ -512,6 +540,10 @@ async function fetchDashboardData(region, isSilent = false) {
                 summary.sentiment.neutral || 100
             ];
             window.newsSentimentChartInstance.update();
+        }
+
+        if (!topIssues || topIssues.length === 0) {
+            throw new Error("No data in DB, trigger RSS fallback");
         }
 
         let htmlTop = '';

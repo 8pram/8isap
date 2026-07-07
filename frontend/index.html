@@ -282,13 +282,21 @@
 
                 <!-- Center Column: Map & Timeline -->
                 <div class="md:col-span-2 flex flex-col gap-4 md:overflow-hidden md:h-full min-h-0">
-                    <!-- Trending Topics (Now taking full height) -->
-                    <div class="cyber-card p-4 flex-1 flex flex-col">
+                    <!-- Live Feed / Recommendation (Moved to Center) -->
+                    <div class="cyber-card p-4 flex flex-col overflow-hidden min-h-[400px] md:min-h-0 md:flex-1">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
-                                class="ph-fill ph-trend-up text-accent-emerald"></i> TRENDING TOPIK & KATA KUNCI</h2>
-                        <div class="flex-1 overflow-y-auto pr-1 space-y-2" id="trending-keywords-dashboard">
-                            <!-- JS Injected Trending -->
-                            <div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-emerald text-xl"></i></div>
+                                class="ph-fill ph-robot text-accent-emerald"></i> AI RECOMMENDATION</h2>
+                        <div class="bg-accent-emerald/5 border border-accent-emerald/20 p-3 rounded mb-4 shrink-0" id="ai-recommendation-box">
+                            <p class="text-[10px] text-accent-emerald font-bold mb-1 tracking-wider">TINDAKAN PREVENTIF:</p>
+                            <p class="text-xs text-gray-300 leading-relaxed" id="ai-recommendation-text">
+                                <i class="ph ph-spinner animate-spin"></i> Memuat rekomendasi AI...
+                            </p>
+                        </div>
+
+                        <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
+                                class="ph-fill ph-broadcast text-accent-blue"></i> RAW OSINT FEED</h2>
+                        <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="osint-feed">
+                            <!-- JS injected feed -->
                         </div>
                     </div>
                 </div>
@@ -327,21 +335,13 @@
                         </div>
                     </div>
 
-                    <!-- Live Feed / Recommendation -->
-                    <div class="cyber-card p-4 flex flex-col overflow-hidden min-h-[400px] md:min-h-0 md:flex-1">
+                    <!-- Trending Topics (Moved to Right) -->
+                    <div class="cyber-card p-4 flex-1 flex flex-col min-h-[250px]">
                         <h2 class="text-[11px] text-gray-400 font-bold mb-3 flex items-center gap-2 tracking-wider"><i
-                                class="ph-fill ph-robot text-accent-emerald"></i> AI RECOMMENDATION</h2>
-                        <div class="bg-accent-emerald/5 border border-accent-emerald/20 p-3 rounded mb-4 shrink-0" id="ai-recommendation-box">
-                            <p class="text-[10px] text-accent-emerald font-bold mb-1 tracking-wider">TINDAKAN PREVENTIF:</p>
-                            <p class="text-xs text-gray-300 leading-relaxed" id="ai-recommendation-text">
-                                <i class="ph ph-spinner animate-spin"></i> Memuat rekomendasi AI...
-                            </p>
-                        </div>
-
-                        <h2 class="text-[11px] text-gray-400 font-bold mb-2 flex items-center gap-2 tracking-wider"><i
-                                class="ph-fill ph-broadcast text-accent-blue"></i> RAW OSINT FEED</h2>
-                        <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="osint-feed">
-                            <!-- JS injected feed -->
+                                class="ph-fill ph-trend-up text-accent-emerald"></i> TRENDING TOPIK & KATA KUNCI</h2>
+                        <div class="flex-1 overflow-y-auto pr-1 space-y-2" id="trending-keywords-dashboard">
+                            <!-- JS Injected Trending -->
+                            <div class="text-center py-4"><i class="ph ph-spinner animate-spin text-accent-emerald text-xl"></i></div>
                         </div>
                     </div>
                 </div>
