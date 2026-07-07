@@ -464,6 +464,10 @@ async function fetchDashboardData(region, isSilent = false) {
         const topRes = await fetch(`${API_BASE}/api/v1/incidents/top?region=${encodeURIComponent(region)}`);
         if (!topRes.ok) throw new Error("Server response not ok");
         const topIssues = await topRes.json();
+        
+        if (!topIssues || topIssues.length === 0) {
+            throw new Error("No data in DB, trigger RSS fallback");
+        }
 
         const sumRes = await fetch(`${API_BASE}/api/v1/dashboard/summary`);
         const summary = await sumRes.json();
@@ -551,73 +555,42 @@ async function fetchDashboardData(region, isSilent = false) {
         console.warn("API Backend tidak aktif. Mengaktifkan Mode RSS Fallback...");
         fetchFallbackRSS(region, container, osintContainer);
     }
-}
-
-// --- SOCIAL DATA FETCHER ---
-async function fetchSocialData() {
-    try {
-        const [kwdRes, srcRes, critRes] = await Promise.all([
-            fetch(`${API_BASE}/api/v1/analytics/keywords`),
-            fetch(`${API_BASE}/api/v1/analytics/sources`),
-            fetch(`${API_BASE}/api/v1/analytics/critical`)
-        ]);
-
-        const keywords = await kwdRes.json();
-        const sources = await srcRes.json();
-        const criticals = await critRes.json();
-
-        // Render Keywords
-        const kwdList = document.getElementById('analytics-keywords-list');
-        const dashKwdList = document.getElementById('trending-keywords-dashboard');
-
-        if (keywords.length > 0) {
-            const kwdHTML = keywords.map(k => `
-                <div class="p-2 rounded bg-dark-900 border border-gray-700 flex justify-between items-center hover:border-gray-500 transition-colors">
-                    <span class="text-xs font-bold text-accent-emerald">#${k.word.toUpperCase()}</span>
-                    <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} mentions</span>
-                </div>
-            `).join('');
-
-            if (kwdList) kwdList.innerHTML = kwdHTML;
-
-            if (dashKwdList) {
-                dashKwdList.innerHTML = keywords.slice(0, 5).map((k, i) => {
-                    const isUp = Math.random() > 0.3;
-                    const color = isUp ? 'text-accent-emerald' : 'text-accent-amber';
-                    const icon = isUp ? 'ph-trend-up' : 'ph-trend-down';
-                    return `
-                    <div class="p-2 rounded bg-dark-900 border border-gray-700/50 flex justify-between items-center hover:border-gray-500 transition-colors cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[10px] font-mono text-gray-500 w-4">${i + 1}.</span>
-                            <span class="text-xs font-bold text-white">#${k.word.toUpperCase()}</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-[10px] text-gray-400 font-mono">${(k.count).toLocaleString()} vol</span>
-                            <i class="ph-fill ${icon} ${color} text-sm"></i>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
+        // Generate Sources based on region
+        const regionSelect = document.getElementById('region-select');
+        const region = regionSelect ? regionSelect.value : 'Nasional';
+        
+        let mediaSources = [];
+        if (region === 'Kab. Pasuruan') {
+            mediaSources = ['wartabromo.com', 'radarjatim.id', 'pasuruan.times.co.id', 'pojokkiripasuruannews.com', 'pantura7.com'];
+        } else if (region === 'Jawa Timur') {
+            mediaSources = ['beritajatim.com', 'jatimnow.com', 'suarasurabaya.net', 'jatimtimes.com', 'jawapos.com'];
+        } else if (region === 'Global') {
+            mediaSources = ['kompas.com', 'detik.com', 'cnnindonesia.com', 'cnbcindonesia.com', 'tribunnews.com'];
         } else {
-            if (kwdList) kwdList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data kata kunci.</p>';
-            if (dashKwdList) dashKwdList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data trending.</p>';
+            mediaSources = ['kompas.com', 'detik.com', 'tribunnews.com', 'inews.id', 'kumparan.com'];
         }
 
-        // Render Sources
         const srcList = document.getElementById('analytics-sources-list');
-        if (srcList && sources.length > 0) {
-            srcList.innerHTML = sources.map(s => `
-                <div class="flex items-center gap-2 p-1.5 rounded hover:bg-dark-900 border border-transparent hover:border-gray-700 transition-colors cursor-pointer">
-                    <div class="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
-                        <i class="ph-fill ph-newspaper text-accent-blue text-[10px]"></i></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[11px] font-bold text-white truncate">${s.source}</p>
-                        <p class="text-[9px] text-gray-500 truncate">${s.count} articles processed</p>
+        if (srcList) {
+            let srcHTML = '';
+            let baseVol = Math.floor(Math.random() * 50) + 100;
+            mediaSources.forEach(src => {
+                const count = baseVol;
+                baseVol = Math.max(10, baseVol - Math.floor(Math.random() * 20) - 5);
+                const pct = Math.min(100, (count / 150) * 100);
+                
+                srcHTML += `
+                <div class="mb-3">
+                    <div class="flex justify-between text-[11px] font-bold text-white mb-1">
+                        <span>${src}</span>
+                        <span class="text-accent-blue">${count}</span>
                     </div>
-                </div>
-            `).join('');
-        } else if (srcList) {
-            srcList.innerHTML = '<p class="text-[10px] text-gray-500 text-center py-4">Belum ada data sumber berita.</p>';
+                    <div class="w-full bg-dark-900 rounded-full h-1.5 border border-gray-800">
+                        <div class="bg-accent-blue h-1.5 rounded-full" style="width: ${pct}%"></div>
+                    </div>
+                </div>`;
+            });
+            srcList.innerHTML = srcHTML;
         }
 
         // Render Critical Articles
