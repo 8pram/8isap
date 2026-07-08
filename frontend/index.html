@@ -145,11 +145,13 @@
         .leaflet-control-attribution {
             filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
         }
+
         @media (max-width: 767px) {
-            #top-issues-container > div:nth-child(n+6) {
+            #top-issues-container>div:nth-child(n+6) {
                 display: none !important;
             }
-            #osint-feed > div:nth-child(n+6) {
+
+            #osint-feed>div:nth-child(n+6) {
                 display: none !important;
             }
         }
@@ -179,12 +181,15 @@
             <div>
                 <h1 class="hidden md:block text-xl font-bold tracking-wider text-white">ISAP <span
                         class="text-accent-blue font-light">COMMAND CENTER</span></h1>
-                <p class="text-[10px] text-gray-400 font-mono tracking-widest leading-none md:mt-1 font-bold md:font-normal">INTELLIGENCE SITUATIONAL AWARENESS PLATFORM</p>
+                <p
+                    class="text-[10px] text-gray-400 font-mono tracking-widest leading-none md:mt-1 font-bold md:font-normal">
+                    INTELLIGENCE SITUATIONAL AWARENESS PLATFORM</p>
             </div>
         </div>
         <div class="flex items-center gap-6">
             <div class="text-right">
-                <p class="text-[10px] md:text-sm font-mono font-bold text-white whitespace-nowrap" id="live-time">00:00:00 WIB</p>
+                <p class="text-[10px] md:text-sm font-mono font-bold text-white whitespace-nowrap" id="live-time">
+                    00:00:00 WIB</p>
                 <p class="text-[9px] md:text-xs text-gray-400 font-mono whitespace-nowrap" id="live-date">1 Jan 2026</p>
             </div>
             <div class="h-8 w-px bg-gray-700"></div>

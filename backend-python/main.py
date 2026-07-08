@@ -39,17 +39,49 @@ app = FastAPI()
 # ==========================================
 
 THREAT_KEYWORDS = {
-    'red': ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran', 'anarkis', 'unras'],
-    'amber': ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas', 'bencana', 'gempa', 'banjir', 'longsor', 'sindikat', 'perdagangan orang', 'penyelundupan', 'scam'],
-    'strategic': ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu', 'kesehatan', 'penyakit', 'hewan ternak', 'harta benda', 'perbankan', 'budaya', 'kegiatan masyarakat', 'ormas', 'keagamaan', 'aparat', 'tni', 'polisi', 'sidang', 'pengadilan'],
-    'geopolitik': ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global', 'gencatan senjata']
+    'red': ['demo', 'unjuk rasa', 'bentrok', 'ricuh', 'tawuran', 'carok', 'kerusuhan', 'kebakaran', 'anarkis', 'unras','jaringan','wisata','wisatawan','wisatawan asing','wisatawan lokal','kasus'],
+    'amber': ['hoaks', 'provokasi', 'radikal', 'teroris', 'pembunuhan', 'begal', 'narkoba', 'narkotika', 'konflik', 'kriminal', 'pencurian', 'korupsi', 'penipuan', 'kecelakaan', 'laka lantas', 'bencana', 'gempa', 'banjir', 'longsor', 'sindikat', 'perdagangan orang', 'penyelundupan', 'scam','jaringan','kasus','ormas','lsm','wisata','tempat wisata','pemuda','horeg','orkes','hiburan','hajatan','macet'],
+    'strategic': ['sembako', 'bbm', 'lpg', 'mbg', 'sekolah rakyat', 'kdmp', 'program pemerintah', 'kebijakan', 'pemerintah', 'bansos', 'bantuan', 'peraturan', 'perjanjian', 'pilpres', 'pilkada', 'pilkades', 'pemilu', 'kesehatan', 'penyakit', 'hewan ternak', 'harta benda', 'perbankan', 'budaya', 'kegiatan masyarakat', 'ormas', 'keagamaan', 'aparat', 'tni', 'polisi', 'sidang', 'pengadilan','kejaksaan','markas','pemkab','pemkot','pemprov','Wawasan Nusantara','macet'],
+    'geopolitik': ['perang', 'geopolitik', 'pelemahan mata uang', 'nilai tukar', 'penutupan akses', 'hormuz', 'hormus', 'krisis global', 'gencatan senjata','Proxy War','Perang Siber','Supply Chain','Geoekonomi','Diplomasi','Wabah','Multilateral','Bilateral','Bebas Aktif','Cyber Warfare']
 }
 
+DOMAINS_PASURUAN = [
+    "kabarlensa.com", "meri.co.id", "pojokkiripasuruannews.com", "smnnews.co.id", 
+    "radarjatim.id", "pasuruannews.com", "pasuruan.times.co.id", "pantura7.com", 
+    "wartabromo.com", "kabarnusa.id", "radarbromo.jawapos.com", "potretkota.com"
+]
+
+DOMAINS_JATIM = [
+    "portaljtv.com", "kabarjawatimur.com", "beritajatim.com", "jurnaljatim.com", 
+    "jatimnow.com", "infojatim.com", "jatimtimes.com", "jatim.antaranews.com", 
+    "jawapos.com", "jatimpos.co", "detik.com", "jatimnet.com", "bangsaonline.com", 
+    "surabaya.tribunnews.com", "radarjatim.id", "jatimmedia.com", "jatimupdate.id", 
+    "mediajatim.com", "potretkota.com", "pantura7.com"
+]
+
+DOMAINS_NASIONAL_GLOBAL = [
+    "inews.id", "tvrinews.com", "rri.co.id", "jpnn.com", "jurnas.com", 
+    "beritasatu.com", "suarapembaharuan.com", "rm.id", "ipol.id", "kompas.com", 
+    "kumparan.com", "nusantaratv.com", "aktual.com", "idntimes.com", "antvklik.com", 
+    "elshinta.com", "inilah.com", "neraca.co.id", "koran-jakarta.com", 
+    "tribunnews.com", "mediaindonesia.com", "wartaekonomi.co.id", "detik.com", 
+    "photo.sindonews.com", "harianterbit.com", "viva.co.id", "idxchannel.com", 
+    "suarakarya.id", "poskota.co", "suara.com", "akurat.co", "sinarharapan.id", 
+    "jakarta.suaramerdeka.com", "jawapos.com", "genpi.co", "cnbcindonesia.com", 
+    "swa.co.id", "wartakota.tribunnews.com", "balipost.com", "liputan6.com", 
+    "okezone.com", "investor.id", "antaranews.com", "tirto.id", "medcom.id", 
+    "galapos.id"
+]
+
+def get_site_query(domains):
+    query = "(" + " OR ".join([f"site:{d}" for d in domains]) + ")"
+    return query.replace(" ", "+")
+
 RSS_SOURCES = [
-    ('Kab. Pasuruan', 'https://news.google.com/rss/search?q=(pasuruan+OR+bangil+OR+pandaan)&hl=id&gl=ID&ceid=ID:id'),
-    ('Jawa Timur', 'https://news.google.com/rss/search?q=(jawa+timur+OR+jatim)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)&hl=id&gl=ID&ceid=ID:id'),
-    ('Nasional', 'https://news.google.com/rss/search?q=(indonesia)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)&hl=id&gl=ID&ceid=ID:id'),
-    ('Global', 'https://news.google.com/rss/search?q=(internasional+OR+dunia)+AND+(narkoba+OR+perang+OR+scam+OR+penyelundupan+OR+geopolitik+OR+kriminal)&hl=id&gl=ID&ceid=ID:id')
+    ('Kab. Pasuruan', f'https://news.google.com/rss/search?q=(pasuruan+OR+bangil+OR+pandaan)+AND+{get_site_query(DOMAINS_PASURUAN)}&hl=id&gl=ID&ceid=ID:id'),
+    ('Jawa Timur', f'https://news.google.com/rss/search?q=(jawa+timur+OR+jatim)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)+AND+{get_site_query(DOMAINS_JATIM)}&hl=id&gl=ID&ceid=ID:id'),
+    ('Nasional', f'https://news.google.com/rss/search?q=(indonesia)+AND+(kriminal+OR+narkoba+OR+korupsi+OR+bencana+OR+politik+OR+pemerintah+OR+aparat+OR+kecelakaan+OR+ormas+OR+agama)+AND+{get_site_query(DOMAINS_NASIONAL_GLOBAL)}&hl=id&gl=ID&ceid=ID:id'),
+    ('Global', f'https://news.google.com/rss/search?q=(internasional+OR+dunia)+AND+(narkoba+OR+perang+OR+scam+OR+penyelundupan+OR+geopolitik+OR+kriminal)+AND+{get_site_query(DOMAINS_NASIONAL_GLOBAL)}&hl=id&gl=ID&ceid=ID:id')
 ]
 
 # ==========================================
