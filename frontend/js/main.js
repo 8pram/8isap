@@ -656,7 +656,7 @@ async function fetchSocialData() {
         } else if (region === 'Global') {
             mediaSources = ['kompas.com', 'detik.com', 'cnnindonesia.com', 'cnbcindonesia.com', 'tribunnews.com'];
         } else {
-            mediaSources = ['kompas.com', 'detik.com', 'tribunnews.com', 'inews.id', 'kumparan.com'];
+            mediaSources = ['kompas.com', 'detik.com', 'tribunnews.com', 'inews.id', 'kumparan.com', 'suaratempo.com', 'radarbidiknasional.id', 'radartempo.id', 'targetnews.id', 'klikwarta.com'];
         }
 
         const srcList = document.getElementById('analytics-sources-list');
@@ -836,7 +836,7 @@ function renderOsintItem(item) {
     else if (item.sentiment_label === 'Positif') sentimentColor = 'text-accent-emerald border-accent-emerald/30 bg-accent-emerald/10';
 
     return `
-    <div class="p-2.5 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-600 transition-colors mb-2">
+    <div class="p-2.5 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-600 transition-colors mb-2 cursor-pointer" onclick="window.open('${item.url || '#'}', '_blank')">
         <div class="flex items-center justify-between mb-1.5">
             <div class="flex items-center gap-1.5">
                 <i class="ph-fill ${platform.icon} ${platform.color} text-sm"></i>

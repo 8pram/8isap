@@ -70,7 +70,8 @@ DOMAINS_NASIONAL_GLOBAL = [
     "jakarta.suaramerdeka.com", "jawapos.com", "genpi.co", "cnbcindonesia.com", 
     "swa.co.id", "wartakota.tribunnews.com", "balipost.com", "liputan6.com", 
     "okezone.com", "investor.id", "antaranews.com", "tirto.id", "medcom.id", 
-    "galapos.id"
+    "galapos.id", "suaratempo.com", "radarbidiknasional.id", "radartempo.id",
+    "targetnews.id", "klikwarta.com"
 ]
 
 def get_site_query(domains):
