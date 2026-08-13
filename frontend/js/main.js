@@ -765,7 +765,7 @@ async function fetchFallbackRSS(region, container, osintContainer) {
             const bgIcon = analysis.threatLevel === 'red' ? 'bg-accent-red/10' : analysis.threatLevel === 'amber' ? 'bg-accent-amber/10' : 'bg-accent-blue/10';
 
             htmlTop += `
-            <div class="flex items-center justify-between p-2 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-500 transition-colors cursor-pointer relative overflow-hidden">
+            <div class="flex items-center justify-between p-2 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-500 transition-colors cursor-pointer relative overflow-hidden" onclick="window.open('${item.link || '#'}', '_blank')">
                 <div class="absolute top-0 right-0 w-1.5 h-full ${analysis.threatLevel === 'red' ? 'bg-accent-red' : 'bg-transparent'}"></div>
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded ${bgIcon} flex items-center justify-center shrink-0">
@@ -792,7 +792,7 @@ async function fetchFallbackRSS(region, container, osintContainer) {
             else if (analysis.threatLevel === 'amber') { sentiment = 'Waspada'; sentimentColor = 'text-accent-amber border-accent-amber/30 bg-accent-amber/10'; }
 
             htmlOsint += `
-            <div class="p-2.5 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-600 transition-colors mb-2">
+            <div class="p-2.5 rounded bg-dark-900 border border-gray-700/50 hover:border-gray-600 transition-colors mb-2 cursor-pointer" onclick="window.open('${item.link || '#'}', '_blank')">
                 <div class="flex items-center justify-between mb-1.5">
                     <div class="flex items-center gap-1.5">
                         <i class="ph-fill ph-globe text-accent-emerald text-sm"></i>
